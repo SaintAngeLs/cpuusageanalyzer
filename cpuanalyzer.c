@@ -9,6 +9,20 @@
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
+#include <pthread.h>
+
+
+void *reader_thread(void *arg);
+void *analyzer_thread(void *arg);
+void *printer_thread(void *arg);
+void *watchdog_thread(void *arg);
+void *logger_thread(void *arg);
+
+
+void initialize_mutex_and_cond();
+void create_threads(pthread_t *threads);
+void join_threads(pthread_t *threads);
+void cleanup_mutex_and_cond();
 
 
 // 
@@ -22,7 +36,11 @@ void usage(char *name)
 }
 
 // Global variable to store the last received signal
-volatile sig_atomic_t last_signal = 0;
+volatile sig_atomic_t last_signal = 0
+;
+pthread_mutex_t data_mutex;
+// condition variable
+pthread_cond_t data_ready_cond;
 
 /**
  * @brief Signal handler for SIGALRM
@@ -41,6 +59,55 @@ int sethandler(void (*f)(int), int sigNo)
     if (-1 == sigaction(sigNo, &act, NULL))
         return -1;
     return 0;
+}
+
+void initialize_mutex_and_cond()
+{
+    pthread_mutex_init(&data_mutex, NULL);
+    pthread_cond_init(&data_ready_cond, NULL);
+}
+
+void create_threads(pthread_t *threads)
+{
+    int ret;
+
+    ret = pthread_create(&threads[0], NULL, reader_thread, NULL);
+    if( 0 != ret)
+        ERR("pthread_create");
+
+    ret = pthread_create(&threads[1], NULL, analyzer_thread, NULL);
+    if( 0 != ret)
+        ERR("pthread_create");
+
+    ret = pthread_create(&threads[2], NULL, printer_thread, NULL);
+    if( 0 != ret)
+        ERR("pthread_create");
+
+    ret = pthread_create(&threads[3], NULL, watchdog_thread, NULL);
+    if( 0 != ret)
+        ERR("pthread_create");
+
+    ret = pthread_create(&threads[4], NULL, logger_thread, NULL);
+    if( 0 != ret)
+        ERR("pthread_create");
+}
+
+void join_threads(pthread_t *threads)
+{
+    int ret, i;
+
+    for(i = 0; i < THREADS_NUMBER; i++)
+    {
+        ret = pthread_join(threads[i], NULL);
+        if(0 != ret)
+            ERR("pthread_join"); 
+    }
+}
+
+void cleanup_mutex_and_cond()
+{
+    pthread_mutex_destroy(&data_mutex);
+    pthread_cond_destroy(&data_ready_cond);
 }
 
 void readProcStat(FILE* file_to_read, struct kernel_proc_stat** stat, int* count_thread, int* read_cap)
@@ -141,6 +208,71 @@ void printProcStat(struct kernel_proc_stat* stat, int count_thread)
     }
 }
 
+void *reader_thread(void *arg)
+{
+    FILE *file_to_read = fopen("/proc/stat", "r");
+    if (NULL == file_to_read)
+        ERR("fopen");
+
+    struct kernel_proc_stat *stat = NULL;
+    int read_cap = 0;
+    int count_thread = 0;
+
+    readProcStat(file_to_read, &stat, &count_thread, &read_cap);
+    printProcStat(stat, count_thread);
+    pthread_mutex_lock(&data_mutex);
+    // passing the data to the Analizer thread ... ...
+    // 
+
+    pthread_mutex_unlock(&data_mutex);
+
+    if (EOF == TEMP_FAILURE_RETRY(fclose(file_to_read)))
+        ERR("fclose");
+
+    free(stat);
+
+    return NULL;
+}
+
+void *analyzer_thread(void *arg)
+{
+    pthread_mutex_lock(&data_mutex);
+    // Obtaining data by the Reader thred
+    // Processing data and calculation the CPU ussage ... ...
+    // Passing the data to the Printer thread ....
+    // 
+    pthread_mutex_unlock(&data_mutex);
+    return NULL;
+}
+
+void *printer_thread(void *arg)
+{
+    pthread_mutex_lock(&data_mutex);
+    // Obtaining the data from the Analyzer thread
+    // Printing the infomration on the screen
+    //  ...     ...
+    pthread_mutex_unlock(&data_mutex);
+    return NULL;
+}
+
+void *watchdog_thread(void *arg)
+{
+    // Serving the Watchdog thread
+    // Check if all the threads are working properly
+    // If there is no answer => program ends
+    // 
+    
+    return NULL;
+}
+
+void *logger_thread(void *arg)
+{
+    // Logger thread serving
+    // Write the logs to the .log
+    // 
+    
+    return NULL;
+}
 
 void testCPUsageAnalyzer()
 {
@@ -169,6 +301,12 @@ void testCPUsageAnalyzer()
   */
 int main(int argc, char **argv)
 {
-	testCPUsageAnalyzer();
+	pthread_t threads[5];
+
+    initialize_mutex_and_cond();
+    create_threads(threads);
+    join_threads(threads);
+    cleanup_mutex_and_cond();
+
     return EXIT_SUCCESS;
 }
