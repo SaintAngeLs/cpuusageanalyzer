@@ -1,5 +1,4 @@
 # Makefile fot the CPU usage analizer: 
-
 CC = gcc
 # enabling the clang compiler
 CLANG = clang
@@ -9,7 +8,10 @@ PROGRAM = cpuanalyzer
 SRCS = cpuanalyzer.c
 OBJS = $(SRCS:.c=.o)
 
-.PHONY: all clean clang
+# Add the name of your test script here
+TEST_SCRIPT = test_cpuanalyzer.py
+
+.PHONY: all clean clang test
 
 # pointing the default target
 all: $(PROGRAM)
@@ -25,6 +27,10 @@ $(PROGRAM): $(OBJS)
 # Targe for the Clang compilation
 clang:
 	$(MAKE) CC=$(CLANG) all
+
+# Target to run the test script
+test: $(PROGRAM)
+	python $(TEST_SCRIPT)
 
 # Ratget to clean up all the generated files
 clean:
