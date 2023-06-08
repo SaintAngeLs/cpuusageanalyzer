@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
+#include <errno.h>
 
 
 // 
@@ -154,7 +155,7 @@ void testCPUsageAnalyzer()
     readProcStat(file_to_read, &stat, &count_thread, &read_cap);
     printProcStat(stat, count_thread);
 
-    if (EOF == fclose(file_to_read))
+    if (EOF == TEMP_FAILURE_RETRY(fclose(file_to_read)))
         ERR("fclose");
 
     free(stat);
