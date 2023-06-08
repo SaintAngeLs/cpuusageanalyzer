@@ -10,19 +10,28 @@
 #include <signal.h>
 #include <errno.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 
-void *reader_thread(void *arg);
-void *analyzer_thread(void *arg);
-void *printer_thread(void *arg);
-void *watchdog_thread(void *arg);
-void *logger_thread(void *arg);
 
+int array_stat_count = 0;
+int available_proc = 0;
+sem_t slots_filled_sem;
+sem_t slots_empty_sem;
+pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;
+struct kernel_proc_stat array_stat[BUFFER_SIZE];
 
-void initialize_mutex_and_cond();
-void create_threads(pthread_t *threads);
-void join_threads(pthread_t *threads);
-void cleanup_mutex_and_cond();
+void usage(char *name);
+void sigalrm_handler(int sig);
+int sethandler(void (*f)(int), int sigNo);
+int get_available_proc();
+int get_semaphore_value(sem_t *semaphore);
+int insert_to_array_stat(struct kernel_proc_stat *stat);
+
+struct kernel_proc_stat *get_proc_stat();
+void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
+void read_proc_stat();
+
 
 
 // 
@@ -36,8 +45,7 @@ void usage(char *name)
 }
 
 // Global variable to store the last received signal
-volatile sig_atomic_t last_signal = 0
-;
+volatile sig_atomic_t last_signal = 0;
 pthread_mutex_t data_mutex;
 // condition variable
 pthread_cond_t data_ready_cond;
@@ -61,134 +69,178 @@ int sethandler(void (*f)(int), int sigNo)
     return 0;
 }
 
-void initialize_mutex_and_cond()
+// get the number fot the processors currently availabele _SC_NPROCESSORS_ONLN
+
+int get_available_proc()
 {
-    pthread_mutex_init(&data_mutex, NULL);
-    pthread_cond_init(&data_ready_cond, NULL);
+    available_proc = sysconf(_SC_NPROCESSORS_ONLN);
+    if(available_proc == -1)
+        ERR("available processors");
+    return 0;
 }
 
-void create_threads(pthread_t *threads)
+int get_semaphore_value(sem_t *semaphore) 
 {
-    int ret;
-
-    ret = pthread_create(&threads[0], NULL, reader_thread, NULL);
-    if( 0 != ret)
-        ERR("pthread_create");
-
-    ret = pthread_create(&threads[1], NULL, analyzer_thread, NULL);
-    if( 0 != ret)
-        ERR("pthread_create");
-
-    ret = pthread_create(&threads[2], NULL, printer_thread, NULL);
-    if( 0 != ret)
-        ERR("pthread_create");
-
-    ret = pthread_create(&threads[3], NULL, watchdog_thread, NULL);
-    if( 0 != ret)
-        ERR("pthread_create");
-
-    ret = pthread_create(&threads[4], NULL, logger_thread, NULL);
-    if( 0 != ret)
-        ERR("pthread_create");
+    int value;
+    sem_getvalue(semaphore, &value);
+    return value;
 }
 
-void join_threads(pthread_t *threads)
+int insert_to_array_stat(struct kernel_proc_stat *stat)
 {
-    int ret, i;
-
-    for(i = 0; i < THREADS_NUMBER; i++)
+    int index = get_semaphore_value(&slots_filled_sem);
+    if(BUFFER_SIZE < index)
     {
-        ret = pthread_join(threads[i], NULL);
-        if(0 != ret)
-            ERR("pthread_join"); 
+        return -1;
     }
-}
-
-void cleanup_mutex_and_cond()
-{
-    pthread_mutex_destroy(&data_mutex);
-    pthread_cond_destroy(&data_ready_cond);
-}
-
-void readProcStat(FILE* file_to_read, struct kernel_proc_stat** stat, int* count_thread, int* read_cap)
-{
-    char read_line[BUFFER_SIZE];
-    while (fgets(read_line, sizeof(read_line), file_to_read))
+    else
     {
-        if (strncmp(read_line, "cpu", 3) == 0)
-        {
-            if (*count_thread == *read_cap)
-            {
-                *read_cap = (*read_cap == 0) ? 1 : (*read_cap) * 2;
-                struct kernel_proc_stat* temp = realloc(*stat, (*read_cap) * sizeof(struct kernel_proc_stat));
-                if (NULL == temp)
-                {
-                    ERR("realloc");
-                }
-                *stat = temp;
-            }
-            
-            parseProcStatLine(read_line, &(*stat)[*count_thread]);
-            (*count_thread)++;
-        }
+        array_stat[index] = *stat;
     }
+    return 0;
 }
 
-void parseProcStatLine(char* line, struct kernel_proc_stat* stat)
+
+
+
+
+FILE* open_proc_stat_file() 
 {
-    char* token = strtok(line, " ");
-    strncpy(stat->name, token, sizeof(stat->name));
-    
-    for (int i = 0; i < 10; i++)
+    FILE *file_to_read = fopen("/proc/stat", "r");
+    if (file_to_read == NULL) 
+    {
+        ERR("fopen");
+        return NULL;
+    }
+    return file_to_read;
+}
+// Function to handle error checking for token
+char* check_token(char *token) {
+    if (token == NULL) 
+    {
+        perror("Parsing error");
+        return NULL;
+    }
+    return token;
+}
+
+// Function to set kernel_proc_stat values
+void set_kernel_proc_stat_values(struct kernel_proc_stat* stat, unsigned long values[], char* name) {
+    strncpy(stat->name, name, sizeof(stat->name));
+    stat->user = values[0];
+    stat->nice = values[1];
+    stat->system = values[2];
+    stat->idle = values[3];
+    stat->iowait = values[4];
+    stat->irq = values[5];
+    stat->softirq = values[6];
+    stat->steal = values[7];
+    stat->guest = values[8];
+    stat->guest_nice = values[9];
+}
+
+// Main parse_line function
+int parse_line(char* read_line, struct kernel_proc_stat* stats, int thread) 
+{
+    char name[16];
+    unsigned long values[10];
+
+    char *token = strtok(read_line, " ");
+    strncpy(name, token, sizeof(name));
+
+    for (int i = 0; i < 10; i++) 
     {
         token = strtok(NULL, " ");
-        if (NULL == token)
+        token = check_token(token);
+        if (token == NULL) 
         {
-            ERR("Parsing error");
+            return -1;
         }
-        
-        switch (i)
-        {
-            case 0:
-                stat->user = strtoul(token, NULL, 10);
-                break;
-            case 1:
-                stat->nice = strtoul(token, NULL, 10);
-                break;
-            case 2:
-                stat->system = strtoul(token, NULL, 10);
-                break;
-            case 3:
-                stat->idle = strtoul(token, NULL, 10);
-                break;
-            case 4:
-                stat->iowait = strtoul(token, NULL, 10);
-                break;
-            case 5:
-                stat->irq = strtoul(token, NULL, 10);
-                break;
-            case 6:
-                stat->softirq = strtoul(token, NULL, 10);
-                break;
-            case 7:
-                stat->steal = strtoul(token, NULL, 10);
-                break;
-            case 8:
-                stat->guest = strtoul(token, NULL, 10);
-                break;
-            case 9:
-                stat->guest_nice = strtoul(token, NULL, 10);
-                break;
-        }
+        values[i] = strtoul(token, NULL, 10);
     }
+
+    set_kernel_proc_stat_values(&stats[thread], values, name);
+
+    return 0;
 }
 
 
-void printProcStat(struct kernel_proc_stat* stat, int count_thread)
+struct kernel_proc_stat *get_proc_stat() 
 {
-     int numColumns = 11; // Number of columns in the table
+    FILE *file_to_read = open_proc_stat_file();
+    if (file_to_read == NULL) 
+    {
+        return NULL;
+    }
+
+    char read_line[BUFFER_SIZE];
+    struct kernel_proc_stat *stat = malloc(BUFFER_SIZE * sizeof(struct kernel_proc_stat));
+    if(stat == NULL)
+    {
+        ERR("Error allocating memory");
+        if (fclose(file_to_read) == EOF) 
+        {
+            ERR("Error closing file");
+            return NULL;
+        }
+        return NULL;
+    }
+
+    int thread = 0;
+
+    while (fgets(read_line, sizeof(read_line), file_to_read)) 
+    {
+        if (strncmp(read_line, "cpu", 3) != 0) 
+        {
+            continue;
+        }
+
+        if (parse_line(read_line, stat, thread) == -1) 
+        {
+            if (fclose(file_to_read) == EOF) 
+            {
+                ERR("Error closing file");
+                return NULL;
+            }
+            free(stat);
+            return NULL;
+        }
+
+        thread++;
+        if (thread == BUFFER_SIZE) 
+        {
+            break;
+        }
+    }
+
+    if (fclose(file_to_read) == EOF) 
+    {
+        ERR("Error closing file");
+        return NULL;
+    }
+
+    return stat;
+}
+
+
+
+void read_proc_stat()
+{
+    int numColumns = 11; // Number of columns in the table
     int lineWidth = (numColumns * 10) + (numColumns - 1); // Calculate the line width dynamically
 
+    struct kernel_proc_stat *stat = NULL;
+    
+    if(NULL == (stat = get_proc_stat()))
+        return;
+    sem_wait(&slots_empty_sem);
+    pthread_mutex_lock(&bufferMutex);
+    insert_to_array_stat(stat);
+    pthread_mutex_unlock(&bufferMutex);
+    //sem_wait(&slots_filled_sem);
+    sem_post(&slots_filled_sem);
+
+    
     printf("%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s\n",
            "Name", "User", "Nice", "System", "Idle", "IOWait", "IRQ", "SoftIRQ",
            "Steal", "Guest", "GuestNice");
@@ -199,114 +251,83 @@ void printProcStat(struct kernel_proc_stat* stat, int count_thread)
     }
     printf("\n");
 
-    for (int i = 0; i < count_thread; i++)
+    for (int i = 0; i < available_proc; i++)
     {
         printf("%-10s %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu\n",
                stat[i].name, stat[i].user, stat[i].nice, stat[i].system,
                stat[i].idle, stat[i].iowait, stat[i].irq, stat[i].softirq,
                stat[i].steal, stat[i].guest, stat[i].guest_nice);
     }
-}
-
-void *reader_thread(void *arg)
-{
-    FILE *file_to_read = fopen("/proc/stat", "r");
-    if (NULL == file_to_read)
-        ERR("fopen");
-
-    struct kernel_proc_stat *stat = NULL;
-    int read_cap = 0;
-    int count_thread = 0;
-
-    readProcStat(file_to_read, &stat, &count_thread, &read_cap);
-    printProcStat(stat, count_thread);
-    pthread_mutex_lock(&data_mutex);
-    // passing the data to the Analizer thread ... ...
-    // 
-
-    pthread_mutex_unlock(&data_mutex);
-
-    if (EOF == TEMP_FAILURE_RETRY(fclose(file_to_read)))
-        ERR("fclose");
-
-    free(stat);
-
-    return NULL;
-}
-
-void *analyzer_thread(void *arg)
-{
-    pthread_mutex_lock(&data_mutex);
-    // Obtaining data by the Reader thred
-    // Processing data and calculation the CPU ussage ... ...
-    // Passing the data to the Printer thread ....
-    // 
-    pthread_mutex_unlock(&data_mutex);
-    return NULL;
-}
-
-void *printer_thread(void *arg)
-{
-    pthread_mutex_lock(&data_mutex);
-    // Obtaining the data from the Analyzer thread
-    // Printing the infomration on the screen
-    //  ...     ...
-    pthread_mutex_unlock(&data_mutex);
-    return NULL;
-}
-
-void *watchdog_thread(void *arg)
-{
-    // Serving the Watchdog thread
-    // Check if all the threads are working properly
-    // If there is no answer => program ends
-    // 
-    
-    return NULL;
-}
-
-void *logger_thread(void *arg)
-{
-    // Logger thread serving
-    // Write the logs to the .log
-    // 
-    
-    return NULL;
-}
-
-void testCPUsageAnalyzer()
-{
-    FILE *file_to_read = fopen("/proc/stat", "r");
-    if (file_to_read == NULL)
-        ERR("fopen");
-
-    struct kernel_proc_stat *stat = NULL;
-    int read_cap = 0;
-    int count_thread = 0;
-
-    readProcStat(file_to_read, &stat, &count_thread, &read_cap);
-    printProcStat(stat, count_thread);
-
-    if (EOF == TEMP_FAILURE_RETRY(fclose(file_to_read)))
-        ERR("fclose");
-
     free(stat);
 }
 
- /**
-  * [main description]
-  * @param  argc [description]
-  * @param  argv [description]
-  * @return      [description]
-  */
-int main(int argc, char **argv)
-{
-	pthread_t threads[5];
 
-    initialize_mutex_and_cond();
-    create_threads(threads);
-    join_threads(threads);
-    cleanup_mutex_and_cond();
+//  /**
+//   * [main description]
+//   * @param  argc [description]
+//   * @param  argv [description]
+//   * @return      [description]
+//   */
+// int main(int argc, char **argv)
+// {
+// 	if(-1 == get_available_proc())
+//         ERR("No available processors");
+//     // initializing semaphores
+//     if(TEMP_FAILURE_RETRY(sem_init(&slots_empty_sem, 0, BUFFER_SIZE)) || TEMP_FAILURE_RETRY(sem_init(&slots_filled_sem, 0, 0)))
+//         ERR("sem_init");
+
+//     available_proc++;
+//     // in ttesting function do not foreget to increast the available process stat
+//     read_proc_stat();
+
+//     return EXIT_SUCCESS;
+    
+// }
+
+void test_cpu_analyzer() {
+    // Test open_proc_stat_file function
+    FILE *file = open_proc_stat_file();
+    if (file == NULL) {
+        printf("open_proc_stat_file FAILED.\n");
+    } else {
+        printf("open_proc_stat_file PASSED.\n");
+        if (fclose(file) == EOF) 
+        {
+            ERR("Error closing file");
+        }
+    }
+
+    // Test get_available_proc function
+    int result = get_available_proc();
+    if (result == -1) {
+        printf("get_available_proc FAILED: theere is no available processors\n");
+    } else {
+        printf("get_available_proc PASSED.\n");
+    }
+
+    // Test get_proc_stat function
+    struct kernel_proc_stat *stats = get_proc_stat();
+    if (stats == NULL) {
+        printf("get_proc_stat FAILED: stats == NULL\n");
+    } else {
+        printf("get_proc_stat PASSED.\n");
+        free(stats);
+    }
+}
+
+int main(int argc, char **argv) {
+    // Run the tests
+    test_cpu_analyzer();
+
+    if(-1 == get_available_proc())
+        ERR("No available processors");
+    // initializing semaphores
+    if(TEMP_FAILURE_RETRY(sem_init(&slots_empty_sem, 0, BUFFER_SIZE)) || TEMP_FAILURE_RETRY(sem_init(&slots_filled_sem, 0, 0)))
+        ERR("sem_init");
+
+
+    available_proc++;
+    read_proc_stat();
 
     return EXIT_SUCCESS;
 }
