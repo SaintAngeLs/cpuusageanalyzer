@@ -5,18 +5,18 @@ CLANG = clang
 CFLAGS = -Wall -Werror -std=c99
 
 PROGRAM = cpuanalyzer
-SRCS = cpuanalyzer.c
+SRCS = cpuanalyzer.c reader_cpuanalyzer.c analyzer_cpuanalyzer.c
 OBJS = $(SRCS:.c=.o)
 
 # Add the name of your test script here
 TEST_SCRIPT = test_cpuanalyzer.py
 
-.PHONY: all clean clang test
+.PHONY: all clean test
 
-# pointing the default target
+# Default target
 all: $(PROGRAM)
 
-# Rule fot the program building
+# Rule for building the program
 $(PROGRAM): $(OBJS)
 	$(CC) $(CFLAGS) -o $(PROGRAM) $(OBJS)
 
@@ -24,14 +24,10 @@ $(PROGRAM): $(OBJS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Targe for the Clang compilation
-clang:
-	$(MAKE) CC=$(CLANG) all
-
 # Target to run the test script
 test: $(PROGRAM)
 	python $(TEST_SCRIPT)
 
-# Ratget to clean up all the generated files
+# Target to clean up all generated files
 clean:
 	rm -f $(PROGRAM) $(OBJS)

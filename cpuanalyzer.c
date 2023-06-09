@@ -1,5 +1,7 @@
 // CPU usage analizer 
 #include "cpuanalyzer.h"
+#include "reader_cpuanalyzer.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +13,8 @@
 #include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
-
+#include "reader_cpuanalyzer.h"
+#include "analyzer_cpuanalyzer.h"
 
 
 int array_stat_count = 0;
@@ -21,14 +24,7 @@ sem_t slots_empty_sem;
 pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 struct kernel_proc_stat *array_stat[BUFFER_SIZE];
 
-void usage(char *name);
-void sigalrm_handler(int sig);
-int sethandler(void (*f)(int), int sigNo);
-int get_available_proc();
-int get_semaphore_value(sem_t *semaphore);
 
-void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
-void read_proc_stat();
 
 
 
@@ -41,12 +37,9 @@ void usage(char *name)
 {
     fprintf(stderr, "Usage: %s <argument1> <argument2> ...\n", name);
 }
-
 // Global variable to store the last received signal
 volatile sig_atomic_t last_signal = 0;
-pthread_mutex_t data_mutex;
-// condition variable
-pthread_cond_t data_ready_cond;
+
 
 /**
  * @brief Signal handler for SIGALRM
@@ -95,44 +88,6 @@ struct kernel_proc_stat *insert_to_array_stat()
     return array_stat[index];
 }
 
-
-FILE* open_proc_stat_file() 
-{
-    FILE *file_to_read = fopen("/proc/stat", "r");
-    if (file_to_read == NULL) 
-    {
-        ERR("fopen");
-        return NULL;
-    }
-    return file_to_read;
-}
-// Function to handle error checking for token
-char* check_token(char *token) 
-{
-    if (token == NULL) 
-    {
-        perror("Parsing error");
-        return NULL;
-    }
-    return token;
-}
-
-// Function to set kernel_proc_stat values
-void set_kernel_proc_stat_values(struct kernel_proc_stat* stat, unsigned long values[], char* name) 
-{
-    strncpy(stat->name, name, sizeof(stat->name));
-
-    stat->user = values[0];
-    stat->nice = values[1];
-    stat->system = values[2];
-    stat->idle = values[3];
-    stat->iowait = values[4];
-    stat->irq = values[5];
-    stat->softirq = values[6];
-    stat->steal = values[7];
-    stat->guest = values[8];
-    stat->guest_nice = values[9];
-}
 
 // // Main parse_line function
 // int parse_line(char* read_line, struct kernel_proc_stat* stats, int thread) 
@@ -212,55 +167,7 @@ void set_kernel_proc_stat_values(struct kernel_proc_stat* stat, unsigned long va
 // }
 // 
 // 
-int parse_proc_line(const char* line, struct kernel_proc_stat* stat)
-{
-    if (sscanf(line, "%s %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu",
-               stat->name, &stat->user, &stat->nice,
-               &stat->system, &stat->idle, &stat->iowait,
-               &stat->irq, &stat->softirq, &stat->steal,
-               &stat->guest, &stat->guest_nice) != 11)
-    {
-        ERR("Error parsing line");
-        return -1;
-    }
 
-    return 0;
-}
-
-int get_proc_stat(struct kernel_proc_stat *stats) 
-{
-    FILE *file_to_read = open_proc_stat_file();
-    char line[1024];
-    for (int thread = 0; thread < available_proc; thread++) 
-    {
-        fgets(line, sizeof(line), file_to_read);
-
-        if (strncmp(line, "cpu", 3) != 0) 
-        {
-            perror("Reading thread info failed");
-
-            if (fclose(file_to_read) == EOF) 
-            {
-                ERR("Error closing file");
-                return -1;
-            }
-            
-            return -1;
-        }
-        int result = parse_proc_line(line, &stats[thread]);
-        if (result == -1) 
-        {
-            return -1;
-        }
-    }
-
-    if (fclose(file_to_read) == EOF) 
-    {
-        ERR("Error closing file");
-        return -1;
-    }
-    return 0;
-}
 // cpu usage analizer calculation formula
 // 
 // static U_L calculate_avarage_cpu_usage(struct kernel_proc_stat current, struct kernel_proc_stat previouis)
@@ -278,74 +185,7 @@ int get_proc_stat(struct kernel_proc_stat *stats)
 
 //     return (currentTotal - currentIdle)*100/currentTotal;
 // }
-void *analyzer_proc_stat_thread()
-{
 
-    while (1)
-    {
-        sem_wait(&slots_empty_sem);
-        pthread_mutex_lock(&bufferMutex);
-        struct kernel_proc_stat *stat = insert_to_array_stat();
-        if (get_proc_stat(stat) == -1)
-            continue;
-        if (stat == NULL)
-            continue;
-
-        pthread_mutex_unlock(&bufferMutex);
-        sem_post(&slots_filled_sem);
-
-        pthread_mutex_lock(&bufferMutex);
-        // Print the stats
-        int numColumns = 11; // Number of columns in the table
-        int lineWidth = (numColumns * 10) + (numColumns - 1); // Calculate the line width dynamically
-
-        printf("%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s\n",
-               "Name", "User", "Nice", "System", "Idle", "IOWait", "IRQ", "SoftIRQ",
-               "Steal", "Guest", "GuestNice");
-
-        for (int i = 0; i < lineWidth; i++)
-        {
-            printf("=");
-        }
-        printf("\n");
-
-        for (int i = 0; i < available_proc; i++)
-        {
-            printf("%-10s %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu\n",
-                   stat[i].name, stat[i].user, stat[i].nice, stat[i].system,
-                   stat[i].idle, stat[i].iowait, stat[i].irq, stat[i].softirq,
-                   stat[i].steal, stat[i].guest, stat[i].guest_nice);
-        }
-
-        pthread_mutex_unlock(&bufferMutex);
-    }
-    
-
-}
-
-
-
-void *read_proc_stat_thread()
-{ 
-    while(1)
-    {
-        sem_wait(&slots_empty_sem);
-        pthread_mutex_lock(&bufferMutex);
-        struct kernel_proc_stat *stat = insert_to_array_stat();
-        if(get_proc_stat(stat) == -1)
-        {
-            pthread_mutex_unlock(&bufferMutex);
-            continue;
-        }
-            
-        if(stat == NULL)
-            continue;
-
-        pthread_mutex_unlock(&bufferMutex);
-        sem_post(&slots_filled_sem);
-    }
-        
-}
 
 
 //  /**
@@ -370,46 +210,46 @@ void *read_proc_stat_thread()
     
 // }
 
-void test_cpu_analyzer() 
-{
-    // Test open_proc_stat_file function
-    FILE *file = open_proc_stat_file();
-    if (file == NULL) 
-    {
-        printf("open_proc_stat_file FAILED.\n");
-    } 
-    else 
-    {
-        printf("open_proc_stat_file PASSED.\n");
-        if (fclose(file) == EOF) 
-        {
-            ERR("Error closing file");
-        }
-    }
+// void test_cpu_analyzer() 
+// {
+//     // Test open_proc_stat_file function
+//     FILE *file = open_proc_stat_file();
+//     if (file == NULL) 
+//     {
+//         printf("open_proc_stat_file FAILED.\n");
+//     } 
+//     else 
+//     {
+//         printf("open_proc_stat_file PASSED.\n");
+//         if (fclose(file) == EOF) 
+//         {
+//             ERR("Error closing file");
+//         }
+//     }
 
-    // Test get_available_proc function
-    int result = get_available_proc(&available_proc);
-    if (result == -1) 
-    {
-        printf("get_available_proc FAILED: theere is no available processors\n");
-    } 
-    else 
-    {
-        printf("get_available_proc PASSED.\n");
-    }
+//     // Test get_available_proc function
+//     int result = get_available_proc(&available_proc);
+//     if (result == -1) 
+//     {
+//         printf("get_available_proc FAILED: theere is no available processors\n");
+//     } 
+//     else 
+//     {
+//         printf("get_available_proc PASSED.\n");
+//     }
 
-    // Test get_proc_stat function
-    struct kernel_proc_stat *stat = insert_to_array_stat();
+//     // Test get_proc_stat function
+//     struct kernel_proc_stat *stat = insert_to_array_stat();
 
-    if (get_proc_stat(stat) == -1) 
-    {
-        printf("get_proc_stat FAILED: stats == NULL\n");
-    } 
-    else 
-    {
-        printf("get_proc_stat PASSED.\n");
-    }
-}
+//     if (get_proc_stat(stat) == -1) 
+//     {
+//         printf("get_proc_stat FAILED: stats == NULL\n");
+//     } 
+//     else 
+//     {
+//         printf("get_proc_stat PASSED.\n");
+//     }
+// }
 
 int main(int argc, char **argv) 
 {

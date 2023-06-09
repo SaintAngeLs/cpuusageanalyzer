@@ -4,6 +4,19 @@
 #define _GNU_SOURCE
 #include <stdio.h>
 #include <signal.h> 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <signal.h>
+#include <errno.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+
 
 #define U_L unsigned long
 
@@ -29,11 +42,25 @@ struct kernel_proc_stat
     U_L user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice;
 };
 
+extern int array_stat_count;
+extern int available_proc;
+extern sem_t slots_filled_sem;
+extern sem_t slots_empty_sem;
+extern pthread_mutex_t bufferMutex;
+extern struct kernel_proc_stat *array_stat[BUFFER_SIZE];
+
+
+
+
+
+extern pthread_mutex_t data_mutex;
+
 void usage(char *name);
 void sigalrm_handler(int sig);
 int sethandler(void (*f)(int), int sigNo);
 void readProcStat(FILE* file_to_read, struct kernel_proc_stat** stat, int* count_thread, int* read_cap);
 void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
 void printProcStat(struct kernel_proc_stat* stat, int count_thread);
+struct kernel_proc_stat *insert_to_array_stat();
 
 #endif /* CPUANALYZER_H */
