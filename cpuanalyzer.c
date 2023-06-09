@@ -88,32 +88,23 @@ int get_semaphore_value(sem_t *semaphore)
 
 int insert_to_array_stat(struct kernel_proc_stat *stat)
 {
-    int index = get_semaphore_value(&slots_filled_sem);
-    if(BUFFER_SIZE < index)
+    if(array_stat_count >= BUFFER_SIZE)
     {
         return -1;
     }
-    array_stat[index] = stat;
-    array_stat_count = index + 1; 
+    array_stat[array_stat_count++] = stat;
     return 0;
 }
 
 struct kernel_proc_stat *pop_from_array_stat(void)
 {
-    int index = get_semaphore_value(&slots_filled_sem);
-
-    if(0 > index)
+    if(array_stat_count <= 0)
     {
-        // no numeric value or create the macro
         perror("the index is null");
         return NULL;
     }
-    struct kernel_proc_stat *stat = array_stat[index];
-
-    return stat;
-
+    return array_stat[--array_stat_count];
 }
-
 
 
 
@@ -239,14 +230,13 @@ struct kernel_proc_stat *get_proc_stat()
 void *analyzer_proc_stat_thread()
 {
     while(1)
-    {   
+    {
         sem_wait(&slots_filled_sem);
         pthread_mutex_lock(&bufferMutex);
         // printing the stats
         struct kernel_proc_stat *stat = pop_from_array_stat();
         pthread_mutex_unlock(&bufferMutex);
         sem_post(&slots_empty_sem);
-
         int numColumns = 11; // Number of columns in the table
         int lineWidth = (numColumns * 10) + (numColumns - 1); // Calculate the line width dynamically
 
@@ -260,16 +250,18 @@ void *analyzer_proc_stat_thread()
         }
         printf("\n");
 
-        for (int i = 0; i < array_stat_count; i++)
+        for (int i = 0; i < available_proc; i++)
         {
             printf("%-10s %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu %-10lu\n",
                    stat[i].name, stat[i].user, stat[i].nice, stat[i].system,
                    stat[i].idle, stat[i].iowait, stat[i].irq, stat[i].softirq,
                    stat[i].steal, stat[i].guest, stat[i].guest_nice);
         }
-        free(stat);
+ 
 
+        free(stat);
     }
+    
 
 }
 
@@ -278,11 +270,16 @@ void *analyzer_proc_stat_thread()
 void *read_proc_stat_thread()
 { 
     struct kernel_proc_stat *stat = NULL;
+
     while(1)
     {
-        stat = get_proc_stat();
+
         if((stat = get_proc_stat()) == NULL)
+        {
             return NULL;
+            break;
+
+        }    
 
         sem_wait(&slots_empty_sem);
         pthread_mutex_lock(&bufferMutex);
@@ -290,6 +287,7 @@ void *read_proc_stat_thread()
         pthread_mutex_unlock(&bufferMutex);
         sem_post(&slots_filled_sem);
     }
+        
 }
 
 
@@ -372,13 +370,19 @@ int main(int argc, char **argv)
     pthread_t reader_thread_id;
     pthread_t analyzer_thread_id;
 
-    pthread_create(&reader_thread_id, NULL, read_proc_stat_thread, NULL);
-    pthread_create(&analyzer_thread_id, NULL, analyzer_proc_stat_thread, NULL);
+    if(pthread_create(&reader_thread_id, NULL, read_proc_stat_thread, NULL))
+        ERR("pthread_create");
+    if(pthread_create(&analyzer_thread_id, NULL, analyzer_proc_stat_thread, NULL))
+        ERR("pthread_create");
+
 
     // waiting fot the reading thread ana analizing thread to be terminated
     
     pthread_join(reader_thread_id, NULL);
     pthread_join(analyzer_thread_id, NULL);
+
+        // Cleanup
+    pthread_mutex_destroy(&bufferMutex);
 
         // Run the tests
     //test_cpu_analyzer();
