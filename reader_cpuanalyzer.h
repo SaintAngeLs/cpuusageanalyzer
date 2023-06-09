@@ -2,6 +2,7 @@
 #define READER_CPUANALIZER_H
 #include "cpuanalyzer.h"
 
+#define TIME_SUSPEND 5000000
 struct kernel_proc_stat;
 FILE* open_proc_stat_file();
 char* check_token(char *token);

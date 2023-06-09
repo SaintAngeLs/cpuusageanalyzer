@@ -172,11 +172,13 @@ int get_proc_stat(struct kernel_proc_stat *stats)
 
 void *read_proc_stat_thread()
 { 
+    struct kernel_proc_stat *stat = NULL;
+
     while(1)
     {
         sem_wait(&slots_empty_sem);
         pthread_mutex_lock(&bufferMutex);
-        struct kernel_proc_stat *stat = insert_to_array_stat();
+        stat = insert_to_array_stat();
         if(get_proc_stat(stat) == -1)
         {
             pthread_mutex_unlock(&bufferMutex);
@@ -188,6 +190,9 @@ void *read_proc_stat_thread()
 
         pthread_mutex_unlock(&bufferMutex);
         sem_post(&slots_filled_sem);
+
+        // suspen exec
+        usleep(TIME_SUSPEND);
     }
         
 }
