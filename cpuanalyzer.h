@@ -7,7 +7,7 @@
 
 #define U_L unsigned long
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 10
 #define THREADS_NUMBER 1024
 
 // Macro for handling errors with source indication:

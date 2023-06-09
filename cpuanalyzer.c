@@ -26,9 +26,7 @@ void sigalrm_handler(int sig);
 int sethandler(void (*f)(int), int sigNo);
 int get_available_proc();
 int get_semaphore_value(sem_t *semaphore);
-int insert_to_array_stat(struct kernel_proc_stat *stat);
 
-struct kernel_proc_stat *get_proc_stat();
 void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
 void read_proc_stat();
 
@@ -86,24 +84,25 @@ int get_semaphore_value(sem_t *semaphore)
     return value;
 }
 
-int insert_to_array_stat(struct kernel_proc_stat *stat)
+struct kernel_proc_stat *insert_to_array_stat()
 {
-    if(array_stat_count >= BUFFER_SIZE)
+    int index = get_semaphore_value(&slots_filled_sem);
+    if(index >= BUFFER_SIZE)
     {
-        return -1;
-    }
-    array_stat[array_stat_count++] = stat;
-    return 0;
-}
-
-struct kernel_proc_stat *pop_from_array_stat(void)
-{
-    if(array_stat_count <= 0)
-    {
-        perror("the index is null");
         return NULL;
     }
-    return array_stat[--array_stat_count];
+    return array_stat[index];
+}
+
+struct kernel_proc_stat *pop_from_array_stat()
+{
+    int index = get_semaphore_value(&slots_filled_sem);
+    if(index < 0)
+    {
+        return NULL;
+    }
+    struct kernel_proc_stat *stat = array_stat[index];
+    return stat;
 }
 
 
@@ -173,23 +172,22 @@ int parse_line(char* read_line, struct kernel_proc_stat* stats, int thread)
 }
 
 
-struct kernel_proc_stat *get_proc_stat() 
+int get_proc_stat(struct kernel_proc_stat *stat) 
 {
     FILE *file_to_read = open_proc_stat_file();
-    
-
-    char read_line[BUFFER_SIZE];
-    struct kernel_proc_stat *stat = malloc(available_proc * sizeof(struct kernel_proc_stat));
     if(stat == NULL)
     {
         ERR("Error allocating memory");
         if (fclose(file_to_read) == EOF) 
         {
             ERR("Error closing file");
-            return NULL;
+            return -1;
         }
-        return NULL;
+        return -1;
     }
+
+    char read_line[BUFFER_SIZE];
+    
 
     int thread = 0;
 
@@ -205,10 +203,9 @@ struct kernel_proc_stat *get_proc_stat()
             if (fclose(file_to_read) == EOF) 
             {
                 ERR("Error closing file");
-                return NULL;
+                return -1;
             }
-            free(stat);
-            return NULL;
+            return -1;
         }
 
         thread++;
@@ -221,14 +218,31 @@ struct kernel_proc_stat *get_proc_stat()
     if (fclose(file_to_read) == EOF) 
     {
         ERR("Error closing file");
-        return NULL;
+        return -1;
     }
 
-    return stat;
+    return 0;
 }
+// cpu usage analizer calculation formula
+// 
+// static U_L calculate_avarage_cpu_usage(struct kernel_proc_stat current, struct kernel_proc_stat previouis)
+// {
+//     U_L previousIdle = previouis.idle + previouis.iowait;
+//     U_L currentIdle = current.idle + current.iowait;
+//     U_L previousNonIdle = previouis.user + previouis.nice + previouis.system + previouis.irq + previouis.softirq + previouis.steal;
+//     U_L currentNonIdle = current.user + current.nice + current.system + current.irq + current.softirq + current.steal;
 
+//     U_L previousTotal = previousNonIdle + previousIdle;
+//     U_L currentTotal = currentNonIdle + currentIdle;
+
+//     currentTotal -= previousTotal;
+//     currentIdle -= previousIdle;
+
+//     return (currentTotal - currentIdle)*100/currentTotal;
+// }
 void *analyzer_proc_stat_thread()
 {
+
     while(1)
     {
         sem_wait(&slots_filled_sem);
@@ -259,7 +273,7 @@ void *analyzer_proc_stat_thread()
         }
  
 
-        free(stat);
+        //free(stat);
     }
     
 
@@ -269,21 +283,16 @@ void *analyzer_proc_stat_thread()
 
 void *read_proc_stat_thread()
 { 
-    struct kernel_proc_stat *stat = NULL;
-
     while(1)
     {
-
-        if((stat = get_proc_stat()) == NULL)
-        {
-            return NULL;
-            break;
-
-        }    
-
         sem_wait(&slots_empty_sem);
         pthread_mutex_lock(&bufferMutex);
-        insert_to_array_stat(stat);
+        struct kernel_proc_stat *stat = insert_to_array_stat();
+        if(get_proc_stat(stat) == -1)
+            continue;
+        if(stat == NULL)
+            continue;
+
         pthread_mutex_unlock(&bufferMutex);
         sem_post(&slots_filled_sem);
     }
@@ -342,15 +351,15 @@ void test_cpu_analyzer()
     }
 
     // Test get_proc_stat function
-    struct kernel_proc_stat *stats = get_proc_stat();
-    if (stats == NULL) 
+    struct kernel_proc_stat *stat = insert_to_array_stat();
+
+    if (get_proc_stat(stat) == -1) 
     {
         printf("get_proc_stat FAILED: stats == NULL\n");
     } 
     else 
     {
         printf("get_proc_stat PASSED.\n");
-        free(stats);
     }
 }
 
@@ -358,6 +367,16 @@ int main(int argc, char **argv)
 {
     if(-1 == get_available_proc(&available_proc))
         ERR("No available processors");
+    for(int i = 0; i < BUFFER_SIZE; i++)
+    {
+        array_stat[i] = malloc(available_proc * sizeof(struct kernel_proc_stat));
+        if(array_stat[i] == NULL)
+        {
+            ERR("malloc");
+            return EXIT_FAILURE;
+        }
+    }
+
     // initializing semaphores
     if(TEMP_FAILURE_RETRY(sem_init(&slots_empty_sem, 0, BUFFER_SIZE)) || TEMP_FAILURE_RETRY(sem_init(&slots_filled_sem, 0, 0)))
         ERR("sem_init");
