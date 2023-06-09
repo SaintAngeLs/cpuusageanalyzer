@@ -8,7 +8,7 @@ void *analyzer_proc_stat_thread()
 
     while (1)
     {
-        sem_wait(&slots_empty_sem);
+        sem_wait(&slots_filled_sem);
         pthread_mutex_lock(&bufferMutex);
         stat = insert_to_array_stat();
         for(int i = 0; i < available_proc; i ++)
@@ -55,7 +55,7 @@ void *analyzer_proc_stat_thread()
 
         sem_post(&slots_filled_sem);
     }
-    //free(previous);
+    free(previous);
 
 }
 
