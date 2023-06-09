@@ -87,6 +87,7 @@ int get_semaphore_value(sem_t *semaphore)
 struct kernel_proc_stat *insert_to_array_stat()
 {
     int index = get_semaphore_value(&slots_filled_sem);
+
     if(index >= BUFFER_SIZE)
     {
         return NULL;
@@ -97,6 +98,7 @@ struct kernel_proc_stat *insert_to_array_stat()
 struct kernel_proc_stat *pop_from_array_stat()
 {
     int index = get_semaphore_value(&slots_filled_sem);
+    
     if(index < 0)
     {
         return NULL;
