@@ -234,14 +234,17 @@ int get_proc_stat(struct kernel_proc_stat *stats)
     for (int thread = 0; thread < available_proc; thread++) 
     {
         fgets(line, sizeof(line), file_to_read);
+
         if (strncmp(line, "cpu", 3) != 0) 
         {
             perror("Reading thread info failed");
+
             if (fclose(file_to_read) == EOF) 
             {
                 ERR("Error closing file");
                 return -1;
             }
+            
             return -1;
         }
         int result = parse_proc_line(line, &stats[thread]);
