@@ -95,20 +95,6 @@ struct kernel_proc_stat *insert_to_array_stat()
     return array_stat[index];
 }
 
-struct kernel_proc_stat *pop_from_array_stat()
-{
-    int index = get_semaphore_value(&slots_filled_sem);
-    
-    if(index < 0)
-    {
-        return NULL;
-    }
-    struct kernel_proc_stat *stat = array_stat[index];
-    return stat;
-}
-
-
-
 
 FILE* open_proc_stat_file() 
 {
@@ -152,7 +138,7 @@ void set_kernel_proc_stat_values(struct kernel_proc_stat* stat, unsigned long va
 int parse_line(char* read_line, struct kernel_proc_stat* stats, int thread) 
 {
     char name[16];
-    unsigned long values[10];
+    unsigned long values[10] = {0};
 
     char *token = strtok(read_line, " ");
     strncpy(name, token, sizeof(name));
@@ -160,10 +146,9 @@ int parse_line(char* read_line, struct kernel_proc_stat* stats, int thread)
     for (int i = 0; i < 10; i++) 
     {
         token = strtok(NULL, " ");
-        token = check_token(token);
         if (token == NULL) 
         {
-            return -1;
+            break;
         }
         values[i] = strtoul(token, NULL, 10);
     }
@@ -245,14 +230,21 @@ int get_proc_stat(struct kernel_proc_stat *stat)
 void *analyzer_proc_stat_thread()
 {
 
-    while(1)
+    while (1)
     {
-        sem_wait(&slots_filled_sem);
+        sem_wait(&slots_empty_sem);
         pthread_mutex_lock(&bufferMutex);
-        // printing the stats
-        struct kernel_proc_stat *stat = pop_from_array_stat();
+        struct kernel_proc_stat *stat = insert_to_array_stat();
+        if (get_proc_stat(stat) == -1)
+            continue;
+        if (stat == NULL)
+            continue;
+
         pthread_mutex_unlock(&bufferMutex);
-        sem_post(&slots_empty_sem);
+        sem_post(&slots_filled_sem);
+
+        pthread_mutex_lock(&bufferMutex);
+        // Print the stats
         int numColumns = 11; // Number of columns in the table
         int lineWidth = (numColumns * 10) + (numColumns - 1); // Calculate the line width dynamically
 
@@ -273,9 +265,8 @@ void *analyzer_proc_stat_thread()
                    stat[i].idle, stat[i].iowait, stat[i].irq, stat[i].softirq,
                    stat[i].steal, stat[i].guest, stat[i].guest_nice);
         }
- 
 
-        //free(stat);
+        pthread_mutex_unlock(&bufferMutex);
     }
     
 
