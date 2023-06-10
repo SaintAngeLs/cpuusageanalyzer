@@ -2,7 +2,7 @@
 CC = gcc
 # enabling the clang compiler
 CLANG = clang
-CFLAGS = -Wall -Werror -std=c99
+CFLAGS = -Wall -Wextra -Werror -std=c99
 
 PROGRAM = cpuanalyzer
 SRCS = cpuanalyzer.c reader_cpuanalyzer.c analyzer_cpuanalyzer.c printer_cpuanalyzer.c

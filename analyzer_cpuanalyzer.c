@@ -4,7 +4,7 @@
  * [analyzer_proc_stat_thread analizer wthread]
  * @return [ ]
  */
-void *analyzer_proc_stat_thread()
+void *analyzer_proc_stat_thread(void *seq)
 {
     // states definition (cfarther calculartion)
     U_L *averages = malloc(available_proc * sizeof(struct kernel_proc_stat));
@@ -20,7 +20,8 @@ void *analyzer_proc_stat_thread()
         return NULL;
     }
     struct kernel_proc_stat *stat = NULL; 
-
+    pthread_cleanup_push(free, averages);
+    pthread_cleanup_push(free, previous);
     while (1)
     {
         
@@ -55,7 +56,10 @@ void *analyzer_proc_stat_thread()
         //            stat[i].steal, stat[i].guest, stat[i].guest_nice);
         // }
         // pthread_mutex_unlock(&bufferMutex);
-
+        if (term_signal)
+        {
+            return NULL;
+        }
         sem_wait(&slots_filled_sem);
         pthread_mutex_lock(&bufferMutex);
         stat = insert_to_array_stat();
@@ -76,8 +80,10 @@ void *analyzer_proc_stat_thread()
 
         sem_post(&slots_empty_sem);
     }
-    free(averages);
-    free(previous);
+
+    pthread_cleanup_pop(1);
+    pthread_cleanup_pop(1);
+    return seq;
 
 }
 

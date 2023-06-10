@@ -3,5 +3,5 @@
 
 #include "cpuanalyzer.h"
 
-void *printer_proc_stat_thread();
+void *printer_proc_stat_thread(void *seq);
 #endif

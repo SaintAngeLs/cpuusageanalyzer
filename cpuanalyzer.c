@@ -44,22 +44,19 @@ pthread_t printer_thread_id;
  */
 void usage(char *name)
 {
-    fprintf(stderr, "Usage: %s <argument1> <argument2> ...\n", name);
+    fprintf(stderr, "Usage: %s (no arguments) ...\n", name);
 }
+
 // Global variable to store the last received signal
-volatile sig_atomic_t last_signal = 0;
+volatile sig_atomic_t term_signal = 0;
 
 
 /**
  * @brief Signal handler for SIGALRM
  * @param sig signal number
  */
-void sigalrm_handler(int sig)
-{
-    last_signal = sig;
-}
-// Function for setting signal handlers
-int sethandler(void (*f)(int), int sigNo)
+
+int set_handler(void (*f)(int), int sigNo)
 {
     struct sigaction act;
     memset(&act, 0, sizeof(struct sigaction));
@@ -68,6 +65,15 @@ int sethandler(void (*f)(int), int sigNo)
         return -1;
     return 0;
 }
+// Function for setting signal handlers
+void sigterm_handler()
+{
+    term_signal = 1;
+    pthread_cancel(analyzer_thread_id);
+    pthread_cancel(printer_thread_id);
+    pthread_cancel(reader_thread_id);
+}
+
 
 // get the number fot the processors currently availabele _SC_NPROCESSORS_ONLN
 
@@ -119,8 +125,17 @@ U_L *insert_to_print_buffer()
 
 int main(int argc, char **argv) 
 {
+     if (argc > 1 && strcmp(argv[1], "--terminate") == 0) 
+     {
+        usage(argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    
+
     if(-1 == get_available_proc(&available_proc))
         ERR("No available processors");
+    
     available_proc++;
     for(int i = 0; i < BUFFER_SIZE; i++)
     {
@@ -162,6 +177,12 @@ int main(int argc, char **argv)
         ERR("pthread_create");
     if(pthread_create(&printer_thread_id, NULL, printer_proc_stat_thread, NULL))
         ERR("pthread_create");
+
+    if(set_handler(sigterm_handler, SIGTERM) == -1)
+    {
+        ERR("Setting SIGTERM handler");
+        return EXIT_FAILURE;
+    }
 
 
     // waiting fot the reading thread ana analizing thread to be terminated

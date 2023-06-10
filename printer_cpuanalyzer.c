@@ -1,10 +1,14 @@
 #include "printer_cpuanalyzer.h"
 
-void *printer_proc_stat_thread()
+void *printer_proc_stat_thread(void *seq)
 {
 	U_L *averages = NULL;
 	while(1)
 	{
+		if (term_signal)
+        {
+        	return NULL;
+        }
 		sem_wait(&slots_filled_sem_printer);
 
 		pthread_mutex_lock(&print_bufferMutex);
@@ -24,4 +28,5 @@ void *printer_proc_stat_thread()
 
 		sleep(1);
 	}
+	return seq;
 }

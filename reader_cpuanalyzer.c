@@ -93,12 +93,16 @@ int get_proc_stat(struct kernel_proc_stat *stats)
 
 
 
-void *read_proc_stat_thread()
+void *read_proc_stat_thread(void *seq)
 { 
     struct kernel_proc_stat *stat = NULL;
 
     while(1)
     {
+        if (term_signal)
+        {   
+            return NULL;
+        }
         sem_wait(&slots_empty_sem);
         pthread_mutex_lock(&bufferMutex);
         stat = insert_to_array_stat();
@@ -117,5 +121,6 @@ void *read_proc_stat_thread()
         // suspen exec
         usleep(TIME_SUSPEND);
     }
+    return seq;
         
 }

@@ -43,6 +43,8 @@ struct kernel_proc_stat
     U_L user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice;
 };
 
+extern volatile sig_atomic_t term_signal ;
+
 extern int available_proc;
 extern sem_t slots_filled_sem;
 extern sem_t slots_empty_sem;
@@ -60,8 +62,8 @@ extern pthread_mutex_t print_bufferMutex;
 extern U_L * print_buffer[BUFFER_SIZE];
 
 void usage(char *name);
-void sigalrm_handler(int sig);
-int sethandler(void (*f)(int), int sigNo);
+int set_handler(void (*f)(int), int sigNo);
+void sigterm_handler();
 void readProcStat(FILE* file_to_read, struct kernel_proc_stat** stat, int* count_thread, int* read_cap);
 void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
 void printProcStat(struct kernel_proc_stat* stat, int count_thread);
