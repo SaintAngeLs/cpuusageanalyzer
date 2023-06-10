@@ -11,7 +11,7 @@ void *analyzer_proc_stat_thread()
         sem_wait(&slots_filled_sem);
         pthread_mutex_lock(&bufferMutex);
         stat = insert_to_array_stat();
-        for(int i = 0; i < available_proc; i ++)
+        for(int i = 0; i < available_proc; i++)
         {
             printf("%lu ", calculate_avarage_cpu_usage(stat[i], previous[i]));
             previous[i] = stat[i];
@@ -53,7 +53,7 @@ void *analyzer_proc_stat_thread()
         // }
         // pthread_mutex_unlock(&bufferMutex);
 
-        sem_post(&slots_filled_sem);
+        sem_post(&slots_empty_sem);
     }
     free(previous);
 
