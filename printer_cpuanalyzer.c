@@ -13,7 +13,7 @@ void *printer_proc_stat_thread(void *seq)
 
 		pthread_mutex_lock(&print_bufferMutex);
 
-		system("clear");
+
 
 		averages = insert_to_print_buffer();
 

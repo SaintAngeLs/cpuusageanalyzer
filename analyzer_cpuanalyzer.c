@@ -16,6 +16,7 @@ void *analyzer_proc_stat_thread(void *seq)
     struct kernel_proc_stat *previous = malloc(available_proc * sizeof(struct kernel_proc_stat));
     if(averages == NULL)
     {
+        free(averages);
         ERR("malloc");
         return NULL;
     }
@@ -83,6 +84,8 @@ void *analyzer_proc_stat_thread(void *seq)
 
     pthread_cleanup_pop(1);
     pthread_cleanup_pop(1);
+    free(averages);
+    free(previous);
     return seq;
 
 }

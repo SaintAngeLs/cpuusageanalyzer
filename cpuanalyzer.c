@@ -62,7 +62,10 @@ int set_handler(void (*f)(int), int sigNo)
     memset(&act, 0, sizeof(struct sigaction));
     act.sa_handler = f;
     if (-1 == sigaction(sigNo, &act, NULL))
+    {
+        fprintf(stderr, "Error setting signal handler for signal %d: %s\n", sigNo, strerror(errno));
         return -1;
+    }   
     return 0;
 }
 // Function for setting signal handlers
@@ -72,6 +75,7 @@ void sigterm_handler()
     pthread_cancel(analyzer_thread_id);
     pthread_cancel(printer_thread_id);
     pthread_cancel(reader_thread_id);
+    exit(0);
 }
 
 
@@ -146,7 +150,7 @@ void join_threads()
 
 void cleanup_pthread_mutex_sem()
 {
-     if (pthread_mutex_destroy(&bufferMutex) != 0) {
+    if (pthread_mutex_destroy(&bufferMutex) != 0) {
         fprintf(stderr, "Error destroying buffer mutex: %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
@@ -184,18 +188,17 @@ void cleanup()
 
 int main(int argc, char **argv) 
 {
-     if (argc > 1 && strcmp(argv[1], "--terminate") == 0) 
-     {
+    if (argc > 1 && strcmp(argv[1], "--terminate") != 0) 
+    {
         usage(argv[0]);
         return EXIT_FAILURE;
     }
-
-    
 
     if(-1 == get_available_proc(&available_proc))
         ERR("No available processors");
 
     available_proc++;
+
     for(int i = 0; i < BUFFER_SIZE; i++)
     {
         array_stat[i] = malloc(available_proc * sizeof(struct kernel_proc_stat));
