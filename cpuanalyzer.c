@@ -65,7 +65,11 @@ int set_handler(void (*f)(int), int sigNo)
     {
         fprintf(stderr, "Error setting signal handler for signal %d: %s\n", sigNo, strerror(errno));
         return -1;
-    }   
+    }
+    else
+    {
+        fprintf(stdout, "Signal handler for signal %d set successfully.\n", sigNo);
+    }
     return 0;
 }
 // Function for setting signal handlers
@@ -75,7 +79,6 @@ void sigterm_handler()
     pthread_cancel(analyzer_thread_id);
     pthread_cancel(printer_thread_id);
     pthread_cancel(reader_thread_id);
-    exit(0);
 }
 
 
@@ -245,6 +248,7 @@ int main(int argc, char **argv)
         ERR("Setting SIGTERM handler");
         return EXIT_FAILURE;
     }
+
 
 
     // waiting fot the reading thread ana analizing thread to be terminated
