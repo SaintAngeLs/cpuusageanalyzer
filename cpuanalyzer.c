@@ -1,6 +1,7 @@
 // CPU usage analizer 
 #include "cpuanalyzer.h"
 #include "reader_cpuanalyzer.h"
+#include "printer_cpuanalyzer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,12 +18,23 @@
 #include "analyzer_cpuanalyzer.h"
 
 
-int array_stat_count = 0;
+
 int available_proc = 0;
 sem_t slots_filled_sem;
 sem_t slots_empty_sem;
 pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 struct kernel_proc_stat *array_stat[BUFFER_SIZE];
+
+sem_t slots_filled_sem_printer;
+sem_t slots_empty_sem_printer;
+pthread_mutex_t print_bufferMutex = PTHREAD_MUTEX_INITIALIZER;
+U_L *print_buffer[BUFFER_SIZE];
+
+pthread_t analyzer_thread_id;
+pthread_t reader_thread_id;
+pthread_t printer_thread_id;
+
+
 
 
 // 
@@ -90,6 +102,17 @@ struct kernel_proc_stat *insert_to_array_stat()
 }
 
 
+U_L *insert_to_print_buffer()
+{
+    int index = get_semaphore_value(&slots_filled_sem_printer);
+
+    // if(index >= BUFFER_SIZE)
+    // {
+    //     return NULL;
+    // }
+    return print_buffer[index];
+}
+
 
 int main(int argc, char **argv) 
 {
@@ -104,22 +127,37 @@ int main(int argc, char **argv)
             ERR("malloc");
             return EXIT_FAILURE;
         }
+        print_buffer[i] = malloc(available_proc * sizeof(struct kernel_proc_stat));
+        if(print_buffer[i] == NULL)
+        {
+            ERR("malloc");
+            return EXIT_FAILURE;
+        }
+
     }
 
     // initializing semaphores
     if(TEMP_FAILURE_RETRY(sem_init(&slots_empty_sem, 0, BUFFER_SIZE)) || TEMP_FAILURE_RETRY(sem_init(&slots_filled_sem, 0, 0)))
-        ERR("sem_init");
+    {
+         ERR("sem_init");
+         return EXIT_FAILURE;
+    }   
+     if(TEMP_FAILURE_RETRY(sem_init(&slots_empty_sem_printer, 0, BUFFER_SIZE)) || TEMP_FAILURE_RETRY(sem_init(&slots_filled_sem_printer, 0, 0)))
+    {
+         ERR("sem_init");
+         return EXIT_FAILURE;
+    }  
 
 
     // The ananlizer thread to add
     // add the reading and analizing in thread...
     // 
-    pthread_t reader_thread_id;
-    pthread_t analyzer_thread_id;
 
     if(pthread_create(&reader_thread_id, NULL, read_proc_stat_thread, NULL))
         ERR("pthread_create");
     if(pthread_create(&analyzer_thread_id, NULL, analyzer_proc_stat_thread, NULL))
+        ERR("pthread_create");
+    if(pthread_create(&printer_thread_id, NULL, printer_proc_stat_thread, NULL))
         ERR("pthread_create");
 
 
@@ -127,15 +165,21 @@ int main(int argc, char **argv)
     
     pthread_join(reader_thread_id, NULL);
     pthread_join(analyzer_thread_id, NULL);
+    pthread_join(printer_thread_id, NULL);
 
     // Cleanup
     pthread_mutex_destroy(&bufferMutex);
     sem_destroy(&slots_filled_sem);
     sem_destroy(&slots_empty_sem);
 
+    pthread_mutex_destroy(&print_bufferMutex);
+    sem_destroy(&slots_filled_sem_printer);
+    sem_destroy(&slots_empty_sem_printer);
+
     for(int i = 0; i < BUFFER_SIZE; i++)
     {
         free(array_stat[i]);
+        free(print_buffer[i]);
     }
 
     // Run the tests

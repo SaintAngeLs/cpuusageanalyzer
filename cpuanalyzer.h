@@ -43,15 +43,21 @@ struct kernel_proc_stat
     U_L user, nice, system, idle, iowait, irq, softirq, steal, guest, guest_nice;
 };
 
-extern int array_stat_count;
 extern int available_proc;
 extern sem_t slots_filled_sem;
 extern sem_t slots_empty_sem;
+
 extern pthread_mutex_t bufferMutex;
+
 extern struct kernel_proc_stat *array_stat[BUFFER_SIZE];
 
 
 extern pthread_mutex_t data_mutex;
+
+extern sem_t slots_filled_sem_printer;
+extern sem_t slots_empty_sem_printer;
+extern pthread_mutex_t print_bufferMutex;
+extern U_L * print_buffer[BUFFER_SIZE];
 
 void usage(char *name);
 void sigalrm_handler(int sig);
@@ -60,5 +66,7 @@ void readProcStat(FILE* file_to_read, struct kernel_proc_stat** stat, int* count
 void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
 void printProcStat(struct kernel_proc_stat* stat, int count_thread);
 struct kernel_proc_stat *insert_to_array_stat();
+U_L *insert_to_print_buffer();
+
 
 #endif /* CPUANALYZER_H */

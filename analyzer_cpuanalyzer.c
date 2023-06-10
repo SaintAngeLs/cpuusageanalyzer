@@ -7,6 +7,7 @@
 void *analyzer_proc_stat_thread()
 {
     // states definition (cfarther calculartion)
+    U_L *averages = malloc(available_proc * sizeof(struct kernel_proc_stat));
     struct kernel_proc_stat *previous = malloc(available_proc * sizeof(struct kernel_proc_stat));
     struct kernel_proc_stat *stat = NULL; 
 
@@ -18,6 +19,7 @@ void *analyzer_proc_stat_thread()
         for(int i = 0; i < available_proc; i++)
         {
             printf("%lu ", calculate_avarage_cpu_usage(stat[i], previous[i]));
+            averages[i] = calculate_avarage_cpu_usage(stat[i], previous[i]);
             previous[i] = stat[i];
         }
         printf("\n");
@@ -55,7 +57,17 @@ void *analyzer_proc_stat_thread()
         // pthread_mutex_unlock(&bufferMutex);
 
         sem_post(&slots_empty_sem);
+        sem_wait(&slots_empty_sem_printer);
+        pthread_mutex_lock(&bufferMutex);
+
+        U_L *buffer_averages = insert_to_print_buffer();
+        memcpy(buffer_averages, averages, available_proc * sizeof(U_L));
+
+        pthread_mutex_unlock(&bufferMutex);
+
+        sem_post(&slots_empty_sem_printer);
     }
+    free(averages);
     free(previous);
 
 }
