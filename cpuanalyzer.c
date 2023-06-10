@@ -25,9 +25,6 @@ pthread_mutex_t bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 struct kernel_proc_stat *array_stat[BUFFER_SIZE];
 
 
-
-
-
 // 
 /**
  * function to dislay the informatio nabout the usage of the main function
@@ -77,14 +74,18 @@ int get_semaphore_value(sem_t *semaphore)
     return value;
 }
 
+/**
+ * [insert_to_array_stat insertion to teh array_stat[]
+ * @return [ the last element inserter on the ifree index availagble array_stay[free_index]] 
+ */
 struct kernel_proc_stat *insert_to_array_stat()
 {
     int index = get_semaphore_value(&slots_filled_sem);
 
-    if(index >= BUFFER_SIZE)
-    {
-        return NULL;
-    }
+    // if(index >= BUFFER_SIZE)
+    // {
+    //     return NULL;
+    // }
     return array_stat[index];
 }
 
@@ -127,7 +128,7 @@ int main(int argc, char **argv)
     pthread_join(reader_thread_id, NULL);
     pthread_join(analyzer_thread_id, NULL);
 
-        // Cleanup
+    // Cleanup
     pthread_mutex_destroy(&bufferMutex);
     sem_destroy(&slots_filled_sem);
     sem_destroy(&slots_empty_sem);
@@ -137,7 +138,7 @@ int main(int argc, char **argv)
         free(array_stat[i]);
     }
 
-        // Run the tests
+    // Run the tests
     //test_cpu_analyzer();
     return EXIT_SUCCESS;
 }

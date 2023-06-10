@@ -39,84 +39,7 @@ void set_kernel_proc_stat_values(struct kernel_proc_stat* stat, unsigned long va
     stat->guest_nice = values[9];
 }
 
-// // Main parse_line function
-// int parse_line(char* read_line, struct kernel_proc_stat* stats, int thread) 
-// {
-//     char name[16];
-//     unsigned long values[10] = {0};
 
-//     char *token = strtok(read_line, " ");
-//     strncpy(name, token, sizeof(name));
-
-//     for (int i = 0; i < 10; i++) 
-//     {
-//         token = strtok(NULL, " ");
-//         if (token == NULL) 
-//         {
-//             break;
-//         }
-//         values[i] = strtoul(token, NULL, 10);
-//     }
-
-//     set_kernel_proc_stat_values(&stats[thread], values, name);
-
-//     return 0;
-// }
-
-
-// int get_proc_stat(struct kernel_proc_stat *stat) 
-// {
-//     FILE *file_to_read = open_proc_stat_file();
-//     if(stat == NULL)
-//     {
-//         ERR("Error allocating memory");
-//         if (fclose(file_to_read) == EOF) 
-//         {
-//             ERR("Error closing file");
-//             return -1;
-//         }
-//         return -1;
-//     }
-
-//     char read_line[BUFFER_SIZE];
-    
-
-//     int thread = 0;
-
-//     while (fgets(read_line, sizeof(read_line), file_to_read)) 
-//     {
-//         if (strncmp(read_line, "cpu", 3) != 0) 
-//         {
-//             continue;
-//         }
-
-//         if (parse_line(read_line, stat, thread) == -1) 
-//         {
-//             if (fclose(file_to_read) == EOF) 
-//             {
-//                 ERR("Error closing file");
-//                 return -1;
-//             }
-//             return -1;
-//         }
-
-//         thread++;
-//         if (thread == available_proc) 
-//         {
-//             break;
-//         }
-//     }
-
-//     if (fclose(file_to_read) == EOF) 
-//     {
-//         ERR("Error closing file");
-//         return -1;
-//     }
-
-//     return 0;
-// }
-// 
-// 
 int parse_proc_line(const char* line, struct kernel_proc_stat* stat)
 {
     if (sscanf(line, "%s %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu",
@@ -135,12 +58,12 @@ int parse_proc_line(const char* line, struct kernel_proc_stat* stat)
 int get_proc_stat(struct kernel_proc_stat *stats) 
 {
     FILE *file_to_read = open_proc_stat_file();
-    char line[1024];
+    char line_to_read[ARRAY_BUFFER_SIZE];
     for (int thread = 0; thread < available_proc; thread++) 
     {
-        fgets(line, sizeof(line), file_to_read);
+        fgets(line_to_read, sizeof(line_to_read), file_to_read);
 
-        if (strncmp(line, "cpu", 3) != 0) 
+        if (strncmp(line_to_read, "cpu", 3) != 0) 
         {
             perror("Reading thread info failed");
 
@@ -152,7 +75,7 @@ int get_proc_stat(struct kernel_proc_stat *stats)
             
             return -1;
         }
-        int result = parse_proc_line(line, &stats[thread]);
+        int result = parse_proc_line(line_to_read, &stats[thread]);
         if (result == -1) 
         {
             return -1;

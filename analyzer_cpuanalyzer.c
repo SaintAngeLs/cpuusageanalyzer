@@ -1,5 +1,9 @@
 #include "analyzer_cpuanalyzer.h"
 
+/**
+ * [analyzer_proc_stat_thread analizer wthread]
+ * @return [ ]
+ */
 void *analyzer_proc_stat_thread()
 {
     // states definition (cfarther calculartion)
@@ -26,9 +30,6 @@ void *analyzer_proc_stat_thread()
         // }
         // // if (stat == NULL)
         // //     continue;
-
-        
-        
 
         // // Print the stats
         // int numColumns = 11; // Number of columns in the table
@@ -60,7 +61,12 @@ void *analyzer_proc_stat_thread()
 }
 
 // cpu usage analizer calculation formula
-
+/**
+ * [calculate_avarage_cpu_usage to calculate the cpu ussage]
+ * @param  current  [current tate of the struct]
+ * @param  previous [the state before]
+ * @return          [percent of cpu ussage]
+ */
 U_L calculate_avarage_cpu_usage(struct kernel_proc_stat current, struct kernel_proc_stat previous)
 {
    

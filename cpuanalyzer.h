@@ -22,6 +22,7 @@
 
 #define BUFFER_SIZE 10
 #define THREADS_NUMBER 1024
+#define ARRAY_BUFFER_SIZE 1024
 
 // Macro for handling errors with source indication:
 #define ERR(source) { \
@@ -48,9 +49,6 @@ extern sem_t slots_filled_sem;
 extern sem_t slots_empty_sem;
 extern pthread_mutex_t bufferMutex;
 extern struct kernel_proc_stat *array_stat[BUFFER_SIZE];
-
-
-
 
 
 extern pthread_mutex_t data_mutex;
