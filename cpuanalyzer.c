@@ -122,6 +122,65 @@ U_L *insert_to_print_buffer()
     return print_buffer[index];
 }
 
+void join_threads() 
+{
+    if (pthread_join(reader_thread_id, NULL) != 0) 
+    {
+        fprintf(stderr, "Error joining reader thread: %s\n", strerror(errno));
+        ERR("pthread_join");
+    }
+    if (pthread_join(analyzer_thread_id, NULL) != 0) 
+    {
+        fprintf(stderr, "Error joining analyzer thread: %s\n", strerror(errno));
+        ERR("pthread_join");
+    }
+    if (pthread_join(printer_thread_id, NULL) != 0) 
+    {
+        fprintf(stderr, "Error joining printer thread: %s\n", strerror(errno));
+        ERR("pthread_join");
+    }
+}
+// Cleanup modules
+// 
+
+
+void cleanup_pthread_mutex_sem()
+{
+     if (pthread_mutex_destroy(&bufferMutex) != 0) {
+        fprintf(stderr, "Error destroying buffer mutex: %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
+    if (sem_destroy(&slots_filled_sem) != 0) {
+        fprintf(stderr, "Error destroying filled slots semaphore: %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
+    if (sem_destroy(&slots_empty_sem) != 0) {
+        fprintf(stderr, "Error destroying empty slots semaphore: %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
+    if (pthread_mutex_destroy(&print_bufferMutex) != 0) {
+        fprintf(stderr, "Error destroying print buffer mutex: %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
+    if (sem_destroy(&slots_filled_sem_printer) != 0) {
+        fprintf(stderr, "Error destroying filled slots semaphore (printer): %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
+    if (sem_destroy(&slots_empty_sem_printer) != 0) {
+        fprintf(stderr, "Error destroying empty slots semaphore (printer): %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
+}
+
+void cleanup() 
+{
+    cleanup_pthread_mutex_sem();
+    for (int i = 0; i < BUFFER_SIZE; i++) 
+    {
+        free(array_stat[i]);
+        free(print_buffer[i]);
+    }
+}
 
 int main(int argc, char **argv) 
 {
@@ -135,7 +194,7 @@ int main(int argc, char **argv)
 
     if(-1 == get_available_proc(&available_proc))
         ERR("No available processors");
-    
+
     available_proc++;
     for(int i = 0; i < BUFFER_SIZE; i++)
     {
@@ -186,25 +245,10 @@ int main(int argc, char **argv)
 
 
     // waiting fot the reading thread ana analizing thread to be terminated
-    
-    pthread_join(reader_thread_id, NULL);
-    pthread_join(analyzer_thread_id, NULL);
-    pthread_join(printer_thread_id, NULL);
+    join_threads();
 
     // Cleanup
-    pthread_mutex_destroy(&bufferMutex);
-    sem_destroy(&slots_filled_sem);
-    sem_destroy(&slots_empty_sem);
-
-    pthread_mutex_destroy(&print_bufferMutex);
-    sem_destroy(&slots_filled_sem_printer);
-    sem_destroy(&slots_empty_sem_printer);
-
-    for(int i = 0; i < BUFFER_SIZE; i++)
-    {
-        free(array_stat[i]);
-        free(print_buffer[i]);
-    }
+    cleanup();
 
     // Run the tests
     //test_cpu_analyzer();

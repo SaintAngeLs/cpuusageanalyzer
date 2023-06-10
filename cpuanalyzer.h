@@ -69,6 +69,10 @@ void parseProcStatLine(char* line, struct kernel_proc_stat* stat);
 void printProcStat(struct kernel_proc_stat* stat, int count_thread);
 struct kernel_proc_stat *insert_to_array_stat();
 U_L *insert_to_print_buffer();
+void join_threads();
+void cleanup_pthread_mutex_sem();
+void cleanup();
+
 
 
 #endif /* CPUANALYZER_H */
