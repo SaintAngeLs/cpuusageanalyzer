@@ -9,11 +9,13 @@ void *printer_proc_stat_thread()
 
 		pthread_mutex_lock(&print_bufferMutex);
 
+		system("clear");
+
 		averages = insert_to_print_buffer();
 
 		for(int i = 0; i < available_proc; i++)
 		{
-			printf("%d. %lu \n", i, averages[i]);
+			printf("%d. %lu\n", i,averages[i]);
 		}
 
 		pthread_mutex_unlock(&print_bufferMutex);

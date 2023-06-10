@@ -75,7 +75,10 @@ int get_available_proc(int *available_proc_p)
 {
     *available_proc_p = sysconf(_SC_NPROCESSORS_ONLN);
     if(*available_proc_p == -1)
-        ERR("available processors");
+    {
+       ERR("available processors");
+       return -1;
+   }
     return 0;
 }
 

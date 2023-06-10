@@ -8,22 +8,22 @@ void *analyzer_proc_stat_thread()
 {
     // states definition (cfarther calculartion)
     U_L *averages = malloc(available_proc * sizeof(struct kernel_proc_stat));
+    if(averages == NULL)
+    {
+        ERR("malloc");
+        return NULL;
+    }
     struct kernel_proc_stat *previous = malloc(available_proc * sizeof(struct kernel_proc_stat));
+    if(averages == NULL)
+    {
+        ERR("malloc");
+        return NULL;
+    }
     struct kernel_proc_stat *stat = NULL; 
 
     while (1)
     {
-        sem_wait(&slots_filled_sem);
-        pthread_mutex_lock(&bufferMutex);
-        stat = insert_to_array_stat();
-        for(int i = 0; i < available_proc; i++)
-        {
-            printf("%lu ", calculate_avarage_cpu_usage(stat[i], previous[i]));
-            averages[i] = calculate_avarage_cpu_usage(stat[i], previous[i]);
-            previous[i] = stat[i];
-        }
-        printf("\n");
-        pthread_mutex_unlock(&bufferMutex);
+        
         // //struct kernel_proc_stat *stat = insert_to_array_stat();
         // if (get_proc_stat(stat) == -1)
         // {
@@ -56,16 +56,25 @@ void *analyzer_proc_stat_thread()
         // }
         // pthread_mutex_unlock(&bufferMutex);
 
-        sem_post(&slots_empty_sem);
-        sem_wait(&slots_empty_sem_printer);
+        sem_wait(&slots_filled_sem);
         pthread_mutex_lock(&bufferMutex);
-
-        U_L *buffer_averages = insert_to_print_buffer();
-        memcpy(buffer_averages, averages, available_proc * sizeof(U_L));
-
+        stat = insert_to_array_stat();
+        for(int i = 0; i < available_proc; i++)
+        {
+            averages[i] = calculate_avarage_cpu_usage(stat[i], previous[i]);
+            previous[i] = stat[i];
+        }
         pthread_mutex_unlock(&bufferMutex);
 
-        sem_post(&slots_empty_sem_printer);
+        // Copy averages to print buffer
+        sem_wait(&slots_empty_sem_printer);
+        pthread_mutex_lock(&print_bufferMutex);
+        U_L *buffer_averages = insert_to_print_buffer();
+        memcpy(buffer_averages, averages, available_proc * sizeof(U_L));
+        pthread_mutex_unlock(&print_bufferMutex);
+        sem_post(&slots_filled_sem_printer);
+
+        sem_post(&slots_empty_sem);
     }
     free(averages);
     free(previous);
@@ -90,12 +99,12 @@ U_L calculate_avarage_cpu_usage(struct kernel_proc_stat current, struct kernel_p
     U_L previousTotal = previousNonIdle + previousIdle;
     U_L currentTotal = currentNonIdle + currentIdle;
 
-    printf("previousTotal: %lu, currentTotal: %lu\n", previousTotal, currentTotal);  // Debug print statement
+    //printf("previousTotal: %lu, currentTotal: %lu\n", previousTotal, currentTotal);  // Debug print statement
 
     U_L totalDiff = currentTotal - previousTotal;
     U_L idleDiff = currentIdle - previousIdle;
 
-    printf("currentTotal: %lu, currentIdle: %lu\n", currentTotal, currentIdle);  // Debug print statement
+    //printf("currentTotal: %lu, currentIdle: %lu\n", currentTotal, currentIdle);  // Debug print statement
 
     if (totalDiff == 0) {
         printf("Total difference is zero, CPU usage calculation is not possible.\n");
