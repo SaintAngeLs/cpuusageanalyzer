@@ -2,7 +2,6 @@
 #include "cpuanalyzer.h"
 #include "reader_cpuanalyzer.h"
 #include "printer_cpuanalyzer.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +17,7 @@
 #include "analyzer_cpuanalyzer.h"
 #include "watchdog_analyzer.h"
 #include "logger_cpuanalyzer.h"
+
 
 
 

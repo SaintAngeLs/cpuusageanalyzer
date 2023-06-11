@@ -11,7 +11,11 @@ void *logger_proc_stat_thread(void *seq)
     while (1) {
         watchdog_notifier(logger_thread);
         if (term_signal) {
-            fclose(log_file); // Close the log file before exiting
+            if (fclose(log_file) == EOF) 
+            {
+                fprintf(log_file, "Terminating logger thread. Reason: Signal received.\n");
+                ERR("Error closing file");
+            }
             return NULL;
         }
 
@@ -20,7 +24,7 @@ void *logger_proc_stat_thread(void *seq)
 
         U_L *averages = insert_to_print_buffer();
 
-        for (int i = 0; i < available_proc; i++) {
+         for (int i = 0; i < available_proc; i++) {
             fprintf(log_file, "%d. %lu\n", i, averages[i]); // Write the data to the log file
         }
 
@@ -28,9 +32,10 @@ void *logger_proc_stat_thread(void *seq)
         sem_post(&slots_empty_sem_printer);
 
         fflush(log_file); // Flush the buffer to ensure data is written to the file immediately
+        fprintf(log_file, "Logger thread: Data logged successfully.\n");
     }
 
-     if (fclose(log_file) == EOF) 
+    if (fclose(log_file) == EOF) 
     {
         ERR("Error closing file");
     }

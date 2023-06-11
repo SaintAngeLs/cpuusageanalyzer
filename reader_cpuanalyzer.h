@@ -3,7 +3,7 @@
 #include "cpuanalyzer.h"
 
 
-#define TIME_SUSPEND 500
+#define TIME_SUSPEND 50000
 
 struct kernel_proc_stat;
 FILE* open_proc_stat_file();
