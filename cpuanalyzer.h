@@ -21,9 +21,9 @@
 #define U_L unsigned long
 
 #define BUFFER_SIZE 10
-#define THREADS_NUMBER 1024
 #define ARRAY_BUFFER_SIZE 1024
 #define S_TIME_SLEEP 2
+#define THREADS_NUMBER 3
 
 // Macro for handling errors with source indication:
 #define ERR(source) { \
@@ -78,7 +78,7 @@ extern U_L * print_buffer[BUFFER_SIZE];
 
 
 extern pthread_mutex_t watchdog_bufferMutex;
-extern int threads_to_watchdog[3];
+extern int threads_to_watchdog[THREADS_NUMBER];
 
 void usage(char *name);
 int set_handler(void (*f)(int), int sigNo);

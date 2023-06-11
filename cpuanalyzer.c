@@ -37,16 +37,8 @@ pthread_t printer_thread_id;
 
 pthread_mutex_t watchdog_bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 
-int threads_to_watchdog[3];
+int threads_to_watchdog[THREADS_NUMBER];
 
-
-
-
-// 
-/**
- * function to dislay the informatio nabout the usage of the main function
- * @param name first usage argument 
- */
 void usage(char *name)
 {
     fprintf(stderr, "Usage: %s (no arguments) ...\n", name);
@@ -55,11 +47,6 @@ void usage(char *name)
 // Global variable to store the last received signal
 volatile sig_atomic_t term_signal = 0;
 
-
-/**
- * @brief Signal handler for SIGALRM
- * @param sig signal number
- */
 
 int set_handler(void (*f)(int), int sigNo)
 {
@@ -115,10 +102,6 @@ struct kernel_proc_stat *insert_to_array_stat()
 {
     int index = get_semaphore_value(&slots_filled_sem);
 
-    // if(index >= BUFFER_SIZE)
-    // {
-    //     return NULL;
-    // }
     return array_stat[index];
 }
 
@@ -127,10 +110,6 @@ U_L *insert_to_print_buffer()
 {
     int index = get_semaphore_value(&slots_filled_sem_printer);
 
-    // if(index >= BUFFER_SIZE)
-    // {
-    //     return NULL;
-    // }
     return print_buffer[index];
 }
 
@@ -245,11 +224,6 @@ int main(int argc, char **argv)
          ERR("sem_init");
          return EXIT_FAILURE;
     }  
-
-
-    // The ananlizer thread to add
-    // add the reading and analizing in thread...
-    // 
 
     if(pthread_create(&reader_thread_id, NULL, read_proc_stat_thread, NULL))
         ERR("pthread_create");

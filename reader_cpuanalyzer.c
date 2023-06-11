@@ -114,7 +114,9 @@ void *read_proc_stat_thread(void *seq)
         }
             
         if(stat == NULL)
+        {
             continue;
+        }
 
         pthread_mutex_unlock(&bufferMutex);
         sem_post(&slots_filled_sem);

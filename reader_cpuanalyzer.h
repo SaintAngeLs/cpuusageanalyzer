@@ -3,7 +3,8 @@
 #include "cpuanalyzer.h"
 
 
-#define TIME_SUSPEND 5000000
+#define TIME_SUSPEND 500
+
 struct kernel_proc_stat;
 FILE* open_proc_stat_file();
 char* check_token(char *token);
