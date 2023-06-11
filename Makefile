@@ -5,7 +5,7 @@ CLANG = clang
 CFLAGS = -Wall -Wextra -Werror -std=c99
 
 PROGRAM = cpuanalyzer
-SRCS = cpuanalyzer.c reader_cpuanalyzer.c analyzer_cpuanalyzer.c printer_cpuanalyzer.c
+SRCS = cpuanalyzer.c reader_cpuanalyzer.c analyzer_cpuanalyzer.c printer_cpuanalyzer.c watchdog_cpuanalyzer.c
 OBJS = $(SRCS:.c=.o)
 
 # Add the name of your test script here

@@ -99,6 +99,7 @@ void *read_proc_stat_thread(void *seq)
 
     while(1)
     {
+        watchdog_notifier(reader_thread);
         if (term_signal)
         {   
             return NULL;

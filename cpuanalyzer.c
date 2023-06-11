@@ -16,6 +16,7 @@
 #include <semaphore.h>
 #include "reader_cpuanalyzer.h"
 #include "analyzer_cpuanalyzer.h"
+#include "watchdog_analyzer.h"
 
 
 
@@ -33,6 +34,10 @@ U_L *print_buffer[BUFFER_SIZE];
 pthread_t analyzer_thread_id;
 pthread_t reader_thread_id;
 pthread_t printer_thread_id;
+
+pthread_mutex_t watchdog_bufferMutex = PTHREAD_MUTEX_INITIALIZER;
+
+int threads_to_watchdog[3];
 
 
 
@@ -177,6 +182,10 @@ void cleanup_pthread_mutex_sem()
         fprintf(stderr, "Error destroying empty slots semaphore (printer): %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
+    if (pthread_mutex_destroy(&watchdog_bufferMutex) != 0) {
+        fprintf(stderr, "Error destroying watchdog buffer mutex: %s\n", strerror(errno));
+        ERR("pthread_mutex_destroy");
+    }
 }
 
 void cleanup() 
@@ -191,6 +200,12 @@ void cleanup()
 
 int main(int argc, char **argv) 
 {
+    if(set_handler(sigterm_handler, SIGTERM) == -1)
+    {
+        ERR("Setting SIGTERM handler");
+        return EXIT_FAILURE;
+    }
+
     if (argc > 1 && strcmp(argv[1], "--terminate") != 0) 
     {
         usage(argv[0]);
@@ -243,13 +258,8 @@ int main(int argc, char **argv)
     if(pthread_create(&printer_thread_id, NULL, printer_proc_stat_thread, NULL))
         ERR("pthread_create");
 
-    if(set_handler(sigterm_handler, SIGTERM) == -1)
-    {
-        ERR("Setting SIGTERM handler");
-        return EXIT_FAILURE;
-    }
-
-
+    
+    watchdog_proc_stat_thread();
 
     // waiting fot the reading thread ana analizing thread to be terminated
     join_threads();

@@ -15,7 +15,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
-
+#include "watchdog_analyzer.h"
 
 
 #define U_L unsigned long
@@ -23,6 +23,7 @@
 #define BUFFER_SIZE 10
 #define THREADS_NUMBER 1024
 #define ARRAY_BUFFER_SIZE 1024
+#define S_TIME_SLEEP 2
 
 // Macro for handling errors with source indication:
 #define ERR(source) { \
@@ -36,6 +37,20 @@
     exit(EXIT_FAILURE); \
 }
 
+// struct THREAD_STATE
+// {
+//     int reader_thread;
+//     int analizer_thread;
+//     int printer_thread;
+// };
+
+//
+ enum THREAD_STATE {
+    reader_thread = 0,
+    analizer_thread = 1,
+    printer_thread = 2
+ };
+// Set the initial state
 // Miscellaneous kernel statistics in /proc/stat from the  https://docs.kernel.org/filesystems/proc.html:
 struct kernel_proc_stat
 {
@@ -60,6 +75,10 @@ extern sem_t slots_filled_sem_printer;
 extern sem_t slots_empty_sem_printer;
 extern pthread_mutex_t print_bufferMutex;
 extern U_L * print_buffer[BUFFER_SIZE];
+
+
+extern pthread_mutex_t watchdog_bufferMutex;
+extern int threads_to_watchdog[3];
 
 void usage(char *name);
 int set_handler(void (*f)(int), int sigNo);

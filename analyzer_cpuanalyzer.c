@@ -7,6 +7,11 @@
 void *analyzer_proc_stat_thread(void *seq)
 {
     // states definition (cfarther calculartion)
+    // decl;arations
+
+
+
+    struct kernel_proc_stat *stat = NULL; 
     U_L *averages = malloc(available_proc * sizeof(struct kernel_proc_stat));
     if(averages == NULL)
     {
@@ -20,7 +25,7 @@ void *analyzer_proc_stat_thread(void *seq)
         ERR("malloc");
         return NULL;
     }
-    struct kernel_proc_stat *stat = NULL; 
+    
     pthread_cleanup_push(free, averages);
     pthread_cleanup_push(free, previous);
     while (1)
@@ -61,6 +66,8 @@ void *analyzer_proc_stat_thread(void *seq)
         {
             return NULL;
         }
+        // udpdating working threads
+        watchdog_notifier(analizer_thread);
         sem_wait(&slots_filled_sem);
         pthread_mutex_lock(&bufferMutex);
         stat = insert_to_array_stat();

@@ -5,6 +5,8 @@ void *printer_proc_stat_thread(void *seq)
 	U_L *averages = NULL;
 	while(1)
 	{
+
+		watchdog_notifier(printer_thread);
 		if (term_signal)
         {
         	return NULL;
