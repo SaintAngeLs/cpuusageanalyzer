@@ -17,6 +17,7 @@
 #include "reader_cpuanalyzer.h"
 #include "analyzer_cpuanalyzer.h"
 #include "watchdog_analyzer.h"
+#include "logger_cpuanalyzer.h"
 
 
 
@@ -34,6 +35,7 @@ U_L *print_buffer[BUFFER_SIZE];
 pthread_t analyzer_thread_id;
 pthread_t reader_thread_id;
 pthread_t printer_thread_id;
+pthread_t logger_thread_id;
 
 pthread_mutex_t watchdog_bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -130,6 +132,12 @@ void join_threads()
         fprintf(stderr, "Error joining printer thread: %s\n", strerror(errno));
         ERR("pthread_join");
     }
+    if (pthread_join(logger_thread_id, NULL) != 0) 
+    {
+        fprintf(stderr, "Error joining logger thread: %s\n", strerror(errno));
+        ERR("pthread_join");
+    }
+
 }
 // Cleanup modules
 // 
@@ -230,6 +238,8 @@ int main(int argc, char **argv)
     if(pthread_create(&analyzer_thread_id, NULL, analyzer_proc_stat_thread, NULL))
         ERR("pthread_create");
     if(pthread_create(&printer_thread_id, NULL, printer_proc_stat_thread, NULL))
+        ERR("pthread_create");
+    if (pthread_create(&logger_thread_id, NULL, logger_proc_stat_thread, NULL)) // Create the logger thread
         ERR("pthread_create");
 
     

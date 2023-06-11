@@ -23,7 +23,7 @@
 #define BUFFER_SIZE 10
 #define ARRAY_BUFFER_SIZE 1024
 #define S_TIME_SLEEP 2
-#define THREADS_NUMBER 3
+#define THREADS_NUMBER 4
 
 // Macro for handling errors with source indication:
 #define ERR(source) { \
@@ -48,7 +48,8 @@
  enum THREAD_STATE {
     reader_thread = 0,
     analizer_thread = 1,
-    printer_thread = 2
+    printer_thread = 2,
+    logger_thread = 3
  };
 // Set the initial state
 // Miscellaneous kernel statistics in /proc/stat from the  https://docs.kernel.org/filesystems/proc.html:

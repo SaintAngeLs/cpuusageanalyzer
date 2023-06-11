@@ -12,7 +12,7 @@ void watchdog_proc_stat_thread()
 	while(1)
 	{
 		// The time for the watchdog to wait for the threads sync is 2 s.
-		sleep(S_TIME_SLEEP);
+		sleep(S_TIME_SLEEP + 10);
 		pthread_mutex_lock(&watchdog_bufferMutex);
 		for(int i = 0; i < THREADS_NUMBER; i++)
 		{
