@@ -1,8 +1,8 @@
 # Makefile fot the CPU usage analizer: 
 CC = gcc
 # enabling the clang compiler
-CLANG = clang
-CFLAGS = -Wall -Wextra -Werror -std=c99
+CLANG = clang 
+CFLAGS = -Wall -Wextra -Werror -std=c99 -Weverything  -Wno-unused-parameter -Wno-unused-variable
 
 PROGRAM = cpuanalyzer
 SRCS = cpuanalyzer.c \

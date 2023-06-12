@@ -1,10 +1,20 @@
+/**
+ * @file       reader_cpuanalyzer.c
+ * @defgroup   READER_CPUANALYZER reader cpuanalyzer
+ *
+ * @brief      This file implements reader cpuanalyzer.
+ *
+ * @author     A.Voznesenskyi
+ * @date       06.12.2023
+ */
+
 #include "reader_cpuanalyzer.h"
 
 
 /**
- * @brief Function to open the /proc/stat file
- * @return FILE* Pointer to the opened file, or NULL if an error occurs
+ * @brief      Function to open the /proc/stat file
  *
+ * @return     FILE* Pointer to the opened file, or NULL if an error occurs
  * This function opens the /proc/stat file in read mode and returns a pointer to the opened file.
  * If the file cannot be opened, an error message is printed and NULL is returned.
  * The caller is responsible for closing the file when no longer needed.
@@ -20,15 +30,18 @@ FILE* open_proc_stat_file()
     return file_to_read;
 }
 
+
 /**
- * @brief Function to handle error checking for a token
- * @param token The token to check
- * @return char* The input token if it is not NULL, otherwise NULL
+ * @brief      unction to handle error checking for a token
  *
+ * @param      token  The token to check
+ *
+ * @return     The input token if it is not NULL, otherwise NULL
  * This function checks if the input token is NULL.
  * If the token is NULL, a "Parsing error" message is printed, and NULL is returned.
  * Otherwise, the input token is returned.
- */char* check_token(char *token) 
+ */
+char* check_token(char *token) 
 {
     if (token == NULL) 
     {
@@ -39,11 +52,14 @@ FILE* open_proc_stat_file()
 }
 
 /**
- * @brief Function to set values in a kernel_proc_stat structure
- * @param stat Pointer to the kernel_proc_stat structure to set values in
- * @param values Array of unsigned long values to set in the structure
- * @param name Name string to set in the structure
+ * @brief      Function to set values in a kernel_proc_stat structure
  *
+ * @param      stat    Pointer to the kernel_proc_stat structure to set values in
+ * @param      values  Array of unsigned long values to set in the structure
+ * @param      name    string to set in the structure
+ *
+ * @return     void
+ * 
  * This function sets the values in a kernel_proc_stat structure.
  * The name is copied into the structure using strncpy.
  * The values are assigned to the corresponding members of the structure.
@@ -91,10 +107,12 @@ int parse_proc_line(const char* line, struct kernel_proc_stat* stat)
 }
 
 /**
- * @brief Function to read CPU statistics from /proc/stat file
- * @param stats Pointer to the kernel_proc_stat array to store the read statistics
- * @return int 0 on success, -1 on failure
+ * @brief      Function to read CPU statistics from /proc/stat file
  *
+ * @param      stats  Pointer to the kernel_proc_stat array to store the read statistics
+ *
+ * @return     int 0 on success, -1 on failure
+ * 
  * This function reads CPU statistics from the /proc/stat file.
  * It opens the file using the open_proc_stat_file function and reads each line.
  * The lines are parsed using the parse_proc_line function to extract the relevant statistics.
@@ -140,14 +158,13 @@ int get_proc_stat(struct kernel_proc_stat *stats)
     return 0;
 }
 
-
-
-
 /**
- * @brief Reader thread function to read CPU statistics from /proc/stat file
- * @param seq [unused parameter]
- * @return void* [unused return value]
+ * @brief      Reader thread function to read CPU statistics from /proc/stat file
  *
+ * @param      seq   The sequence
+ *
+ * @return     void
+ * 
  * This function runs in a separate thread and continuously reads CPU statistics from the /proc/stat file.
  * It opens the /proc/stat file using the open_proc_stat_file function and reads each line.
  * The lines are parsed using the parse_proc_line function to extract the relevant statistics.

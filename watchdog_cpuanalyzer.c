@@ -1,9 +1,22 @@
+/**
+ * @file       watchdog_cpuanalyzer.c
+ * @defgroup   WATCHDOG_CPUANALYZER watchdog cpuanalyzer
+ *
+ * @brief      This file implements watchdog cpuanalyzer.
+ *
+ * @author     A.Voznesenskyi
+ * @date       06.12.2023
+ */
+
 #include "watchdog_analyzer.h"
 
 /**
- * @brief Function to notify the watchdog about a thread's activity
- * @param thread_id The ID of the thread to notify
+ * @brief      Function to notify the watchdog about a thread's activity
  *
+ * @param      thread_id The ID of the thread to notify
+ *
+ * @return     void
+ * 
  * This function notifies the watchdog about a thread's activity by setting the corresponding flag in the threads_to_watchdog array.
  * It acquires the watchdog_bufferMutex mutex before updating the flag to ensure thread safety.
  */
@@ -15,8 +28,10 @@ void watchdog_notifier(int thread_id)
 }
 
 /**
- * @brief Watchdog thread function to monitor thread activity
+ * @brief      Watchdog thread function to monitor thread activity
  *
+ * @return     void
+ * 
  * This function runs in a separate thread and continuously monitors the activity of the CPU analyzer threads.
  * It sleeps for a specific time using the sleep function to allow the threads to perform their work.
  * After the sleep period, it checks the threads_to_watchdog array to ensure that all threads have notified their activity.

@@ -1,10 +1,22 @@
+/**
+ * @file       printer_cpuanalyzer.c
+ * @defgroup   PRINTER_CPUANALYZER printer cpuanalyzer
+ *
+ * @brief      This file implements printer cpuanalyzer.
+ *
+ * @author     A.Voznesenskyi
+ * @date       06.12.2023
+ */
+
 #include "printer_cpuanalyzer.h"
 
 /**
- * @brief Printer thread function to print CPU statistics to the console
- * @param seq [unused parameter]
- * @return void* [unused return value]
+ * @brief      Printer thread function to print CPU statistics to the console
  *
+ * @param      seq   The sequence
+ *
+ * @return     void
+ * 
  * This function runs in a separate thread and continuously prints CPU statistics to the console.
  * It retrieves the data from the print buffer and prints it using the printf function.
  * The thread runs until a termination signal is received.
@@ -28,7 +40,6 @@ void *printer_proc_stat_thread(void *seq)
 		sem_wait(&slots_filled_sem_printer);
 
 		pthread_mutex_lock(&print_bufferMutex);
-
 
 
 		averages = insert_to_print_buffer();

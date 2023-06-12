@@ -1,4 +1,12 @@
-// CPU usage analizer 
+/**
+ * @defgroup   CPUANALYZER cpuanalyzer
+ *
+ * @brief      This file implements cpuanalyzer.
+ *
+ * @author     A.Voznesenskyi
+ * @date       06.12.2023
+ */
+ 
 #include "cpuanalyzer.h"
 #include "reader_cpuanalyzer.h"
 #include "printer_cpuanalyzer.h"
@@ -40,8 +48,11 @@ pthread_mutex_t watchdog_bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 int threads_to_watchdog[THREADS_NUMBER];
 
 /**
- * @brief Usage function to print program usage information
- * @param name Name of the program
+ * @brief      Usage function to print program usage information
+ *
+ * @param      name  Name of the program
+ *
+ * @return     void 
  */
 void usage(char *name)
 {
@@ -52,10 +63,13 @@ void usage(char *name)
 volatile sig_atomic_t term_signal = 0;
 
 /**
- * @brief Function to set a signal handler
- * @param f Signal handler function
- * @param sigNo Signal number
- * @return 0 on success, -1 on failure
+ * @brief      Function to set a signal handler
+ *
+ * @param      f     Signal handler function
+ * 
+ * @param      sigNo  Signal number
+ *
+ * @return     0 on success, -1 on failure
  */
 int set_handler(void (*f)(int), int sigNo)
 {
@@ -69,13 +83,19 @@ int set_handler(void (*f)(int), int sigNo)
     }
     else
     {
-        fprintf(stdout, "Signal handler for signal %d set successfully.\n", sigNo);
+        //fprintf(stdout, "Signal handler for signal %d set successfully.\n", sigNo);
     }
     return 0;
 }
 
 /**
  * @brief Signal handler function for SIGTERM
+ */
+
+/**
+ * @brief      Signal handler function for SIGTERM
+ *
+ * @return     void
  */
 void sigterm_handler()
 {
@@ -85,11 +105,12 @@ void sigterm_handler()
     pthread_cancel(reader_thread_id);
 }
 
-
 /**
- * @brief Function to get the number of available processors
- * @param available_proc_p Pointer to store the number of available processors
- * @return 0 on success, -1 on failure
+ * @brief      Function to get the number of available processors
+ *
+ * @param      available_proc_p  Pointer to store the number of available processors
+ *
+ * @return     The available proc 0 on success, -1 on failure.
  */
 int get_available_proc(int *available_proc_p)
 {
@@ -103,9 +124,11 @@ int get_available_proc(int *available_proc_p)
 }
 
 /**
- * @brief Function to get the value of a semaphore
- * @param semaphore Semaphore object
- * @return The value of the semaphore
+ * @brief      Gets the semaphore value.
+ *
+ * @param      semaphore  The semaphore
+ *
+ * @return     The semaphore value.
  */
 int get_semaphore_value(sem_t *semaphore) 
 {
@@ -116,8 +139,9 @@ int get_semaphore_value(sem_t *semaphore)
 
 
 /**
- * @brief Function to insert data into the array_stat
- * @return Pointer to the last element inserted on the free index of array_stat
+ * @brief      Function to insert data into the array_stat
+ *
+ * @return     Pointer to the last element inserted on the free index of array_stat
  */
 struct kernel_proc_stat *insert_to_array_stat()
 {
@@ -126,9 +150,11 @@ struct kernel_proc_stat *insert_to_array_stat()
     return array_stat[index];
 }
 
+
 /**
- * @brief Function to insert data into the print_buffer
- * @return Pointer to the last element inserted on the free index of print_buffer
+ * @brief      Function to insert data into the print_buffer
+ *
+ * @return     Pointer to the last element inserted on the free index of print_buffer
  */
 U_L *insert_to_print_buffer()
 {
@@ -138,7 +164,9 @@ U_L *insert_to_print_buffer()
 }
 
 /**
- * @brief Function to join threads
+ * @brief      Function to join threads
+ *
+ * @return     void
  */
 void join_threads() 
 {
@@ -165,44 +193,55 @@ void join_threads()
 
 }
 
+
 /**
- * @brief Function to perform cleanup of pthreads, mutexes, and semaphores
+ * @brief      Function to perform cleanup of pthreads, mutexes, and semaphores
+ *
+ * @return     void
  */
 void cleanup_pthread_mutex_sem()
 {
-    if (pthread_mutex_destroy(&bufferMutex) != 0) {
+    if (pthread_mutex_destroy(&bufferMutex) != 0) 
+    {
         fprintf(stderr, "Error destroying buffer mutex: %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
-    if (sem_destroy(&slots_filled_sem) != 0) {
+    if (sem_destroy(&slots_filled_sem) != 0) 
+    {
         fprintf(stderr, "Error destroying filled slots semaphore: %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
-    if (sem_destroy(&slots_empty_sem) != 0) {
+    if (sem_destroy(&slots_empty_sem) != 0) 
+    {
         fprintf(stderr, "Error destroying empty slots semaphore: %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
-    if (pthread_mutex_destroy(&print_bufferMutex) != 0) {
+    if (pthread_mutex_destroy(&print_bufferMutex) != 0) 
+    {
         fprintf(stderr, "Error destroying print buffer mutex: %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
-    if (sem_destroy(&slots_filled_sem_printer) != 0) {
+    if (sem_destroy(&slots_filled_sem_printer) != 0) 
+    {
         fprintf(stderr, "Error destroying filled slots semaphore (printer): %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
-    if (sem_destroy(&slots_empty_sem_printer) != 0) {
+    if (sem_destroy(&slots_empty_sem_printer) != 0) 
+    {
         fprintf(stderr, "Error destroying empty slots semaphore (printer): %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
-    if (pthread_mutex_destroy(&watchdog_bufferMutex) != 0) {
+    if (pthread_mutex_destroy(&watchdog_bufferMutex) != 0) 
+    {
         fprintf(stderr, "Error destroying watchdog buffer mutex: %s\n", strerror(errno));
         ERR("pthread_mutex_destroy");
     }
 }
 
-
 /**
- * @brief Function to perform overall cleanup, including freeing memory
+ * @brief      Function to perform overall cleanup, including freeing memory
+ *
+ * @return     void
  */
 void cleanup() 
 {
@@ -215,10 +254,12 @@ void cleanup()
 }
 
 /**
- * @brief Main function of the CPU Analyzer program
- * @param argc Number of command-line arguments
- * @param argv Array of command-line arguments
- * @return EXIT_SUCCESS on success, EXIT_FAILURE on failure
+ * @brief      Main function of the CPU Analyzer program
+ *
+ * @param      argc  Number of command-line arguments
+ * @param      argv  Array of command-line arguments
+ *
+ * @return     EXIT_SUCCESS on success, EXIT_FAILURE on failure
  */
 int main(int argc, char **argv) 
 {

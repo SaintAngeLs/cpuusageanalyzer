@@ -1,9 +1,21 @@
+/**
+ * @file       analyzer_cpuanalyzer.c
+ * @defgroup   ANALYZER_CPUANALYZER analyzer cpuanalyzer
+ *
+ * @brief      This file implements analyzer cpuanalyzer.
+ *
+ * @author     A.Voznesenskyi
+ * @date       12.06.2023
+ */
+
 #include "analyzer_cpuanalyzer.h"
 
 /**
- * @brief analyzer_proc_stat_thread - Analyzer thread function
- * @param seq [unused parameter]
- * @return void* [unused return value]
+ * @brief      analyzer_proc_stat_thread - Analyzer thread function
+ *
+ * @param      seq   The sequence [unused parameter]
+ *
+ * @return     [unused return value]
  */
 void *analyzer_proc_stat_thread(void *seq)
 {
@@ -62,13 +74,14 @@ void *analyzer_proc_stat_thread(void *seq)
     return seq;
 }
 
-// cpu usage analizer calculation formula
-/**
- * [calculate_avarage_cpu_usage to calculate the cpu ussage]
- * @param  current  [current tate of the struct]
- * @param  previous [the state before]
- * @return          [percent of cpu ussage]
- */
+ /**
+  * @brief      Calculates the avarage cpu usage.
+  *
+  * @param      current   The current state of kernel_proc_stat 
+  * @param      previous  The previous state of kernel_proc_stat 
+  *
+  * @return     The avarage cpu usage.
+  */
 U_L calculate_avarage_cpu_usage(struct kernel_proc_stat current, struct kernel_proc_stat previous)
 {
    
