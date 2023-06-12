@@ -19,8 +19,6 @@
 #include "logger_cpuanalyzer.h"
 
 
-
-
 int available_proc = 0;
 sem_t slots_filled_sem;
 sem_t slots_empty_sem;
@@ -41,6 +39,10 @@ pthread_mutex_t watchdog_bufferMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int threads_to_watchdog[THREADS_NUMBER];
 
+/**
+ * @brief Usage function to print program usage information
+ * @param name Name of the program
+ */
 void usage(char *name)
 {
     fprintf(stderr, "Usage: %s (no arguments) ...\n", name);
@@ -49,7 +51,12 @@ void usage(char *name)
 // Global variable to store the last received signal
 volatile sig_atomic_t term_signal = 0;
 
-
+/**
+ * @brief Function to set a signal handler
+ * @param f Signal handler function
+ * @param sigNo Signal number
+ * @return 0 on success, -1 on failure
+ */
 int set_handler(void (*f)(int), int sigNo)
 {
     struct sigaction act;
@@ -66,7 +73,10 @@ int set_handler(void (*f)(int), int sigNo)
     }
     return 0;
 }
-// Function for setting signal handlers
+
+/**
+ * @brief Signal handler function for SIGTERM
+ */
 void sigterm_handler()
 {
     term_signal = 1;
@@ -76,8 +86,11 @@ void sigterm_handler()
 }
 
 
-// get the number fot the processors currently availabele _SC_NPROCESSORS_ONLN
-
+/**
+ * @brief Function to get the number of available processors
+ * @param available_proc_p Pointer to store the number of available processors
+ * @return 0 on success, -1 on failure
+ */
 int get_available_proc(int *available_proc_p)
 {
     *available_proc_p = sysconf(_SC_NPROCESSORS_ONLN);
@@ -89,6 +102,11 @@ int get_available_proc(int *available_proc_p)
     return 0;
 }
 
+/**
+ * @brief Function to get the value of a semaphore
+ * @param semaphore Semaphore object
+ * @return The value of the semaphore
+ */
 int get_semaphore_value(sem_t *semaphore) 
 {
     int value;
@@ -96,9 +114,10 @@ int get_semaphore_value(sem_t *semaphore)
     return value;
 }
 
+
 /**
- * [insert_to_array_stat insertion to teh array_stat[]
- * @return [ the last element inserter on the ifree index availagble array_stay[free_index]] 
+ * @brief Function to insert data into the array_stat
+ * @return Pointer to the last element inserted on the free index of array_stat
  */
 struct kernel_proc_stat *insert_to_array_stat()
 {
@@ -107,7 +126,10 @@ struct kernel_proc_stat *insert_to_array_stat()
     return array_stat[index];
 }
 
-
+/**
+ * @brief Function to insert data into the print_buffer
+ * @return Pointer to the last element inserted on the free index of print_buffer
+ */
 U_L *insert_to_print_buffer()
 {
     int index = get_semaphore_value(&slots_filled_sem_printer);
@@ -115,6 +137,9 @@ U_L *insert_to_print_buffer()
     return print_buffer[index];
 }
 
+/**
+ * @brief Function to join threads
+ */
 void join_threads() 
 {
     if (pthread_join(reader_thread_id, NULL) != 0) 
@@ -139,10 +164,10 @@ void join_threads()
     }
 
 }
-// Cleanup modules
-// 
 
-
+/**
+ * @brief Function to perform cleanup of pthreads, mutexes, and semaphores
+ */
 void cleanup_pthread_mutex_sem()
 {
     if (pthread_mutex_destroy(&bufferMutex) != 0) {
@@ -175,6 +200,10 @@ void cleanup_pthread_mutex_sem()
     }
 }
 
+
+/**
+ * @brief Function to perform overall cleanup, including freeing memory
+ */
 void cleanup() 
 {
     cleanup_pthread_mutex_sem();
@@ -185,6 +214,12 @@ void cleanup()
     }
 }
 
+/**
+ * @brief Main function of the CPU Analyzer program
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line arguments
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE on failure
+ */
 int main(int argc, char **argv) 
 {
     if(set_handler(sigterm_handler, SIGTERM) == -1)

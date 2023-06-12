@@ -1,5 +1,20 @@
 #include "logger_cpuanalyzer.h"
 
+
+/**
+ * @brief Logger thread function to log CPU statistics to a file
+ * @param seq [unused parameter]
+ * @return void* [unused return value]
+ *
+ * This function runs in a separate thread and continuously logs CPU statistics to a log file.
+ * It opens the log file in write mode and writes the data received from the print buffer.
+ * The thread runs until a termination signal is received.
+ * The function uses the slots_filled_sem_printer semaphore and the print_bufferMutex mutex to synchronize access to the print buffer.
+ * The log file is flushed after writing each data set to ensure immediate persistence of the logged data.
+ *
+ * @note The log file is created as "log_cpuanalyzer.txt" in the current directory.
+ * @note If the log file cannot be opened or closed successfully, an error message is printed.
+ */
 void *logger_proc_stat_thread(void *seq)
 {
     FILE *log_file = fopen("log_cpuanalyzer.txt", "w"); // Open the log file in write mode

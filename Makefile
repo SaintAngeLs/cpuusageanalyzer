@@ -9,7 +9,7 @@ SRCS = cpuanalyzer.c reader_cpuanalyzer.c analyzer_cpuanalyzer.c printer_cpuanal
 OBJS = $(SRCS:.c=.o)
 
 # Add the name of your test script here
-TEST_SCRIPT = test_cpuanalyzer.py
+TEST_SCRIPT = sigterm_test.py
 
 .PHONY: all clean test
 

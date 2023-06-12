@@ -1,8 +1,9 @@
 #include "analyzer_cpuanalyzer.h"
 
 /**
- * [analyzer_proc_stat_thread analizer wthread]
- * @return [ ]
+ * @brief analyzer_proc_stat_thread - Analyzer thread function
+ * @param seq [unused parameter]
+ * @return void* [unused return value]
  */
 void *analyzer_proc_stat_thread(void *seq)
 {
