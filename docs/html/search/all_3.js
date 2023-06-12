@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['logger_20cpuanalyzer_0',['logger cpuanalyzer',['../group__LOGGER__CPUANALYZER.html',1,'']]]
+  ['kernel_5fproc_5fstat_0',['kernel_proc_stat',['../structkernel__proc__stat.html',1,'']]]
 ];

@@ -1,0 +1,59 @@
+\hypertarget{analyzer__cpuanalyzer_8c}{}\doxysection{/home/kaliuser/\+Documents/portfolio/cpuusageanalizer/analyzer\+\_\+cpuanalyzer.c File Reference}
+\label{analyzer__cpuanalyzer_8c}\index{/home/kaliuser/Documents/portfolio/cpuusageanalizer/analyzer\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/analyzer\_cpuanalyzer.c}}
+{\ttfamily \#include \char`\"{}analyzer\+\_\+cpuanalyzer.\+h\char`\"{}}\newline
+Include dependency graph for analyzer\+\_\+cpuanalyzer.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{analyzer__cpuanalyzer_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \mbox{\hyperlink{analyzer__cpuanalyzer_8c_acdd8e5b6522c56abfb6820debdb89168}{analyzer\+\_\+proc\+\_\+stat\+\_\+thread}} (void $\ast$seq)
+\begin{DoxyCompactList}\small\item\em analyzer\+\_\+proc\+\_\+stat\+\_\+thread -\/ Analyzer thread function \end{DoxyCompactList}\item 
+U\+\_\+L \mbox{\hyperlink{analyzer__cpuanalyzer_8c_a5a9a79535448f40b5b4af003cbe5a46f}{calculate\+\_\+avarage\+\_\+cpu\+\_\+usage}} (struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} current, struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} previous)
+\begin{DoxyCompactList}\small\item\em Calculates the avarage cpu usage. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{analyzer__cpuanalyzer_8c_acdd8e5b6522c56abfb6820debdb89168}\label{analyzer__cpuanalyzer_8c_acdd8e5b6522c56abfb6820debdb89168}} 
+\index{analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}!analyzer\_proc\_stat\_thread@{analyzer\_proc\_stat\_thread}}
+\index{analyzer\_proc\_stat\_thread@{analyzer\_proc\_stat\_thread}!analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{analyzer\_proc\_stat\_thread()}{analyzer\_proc\_stat\_thread()}}
+{\footnotesize\ttfamily void $\ast$ analyzer\+\_\+proc\+\_\+stat\+\_\+thread (\begin{DoxyParamCaption}\item[{void $\ast$}]{seq }\end{DoxyParamCaption})}
+
+
+
+analyzer\+\_\+proc\+\_\+stat\+\_\+thread -\/ Analyzer thread function 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seq} & The sequence \mbox{[}unused parameter\mbox{]}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\mbox{[}unused return value\mbox{]} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{analyzer__cpuanalyzer_8c_a5a9a79535448f40b5b4af003cbe5a46f}\label{analyzer__cpuanalyzer_8c_a5a9a79535448f40b5b4af003cbe5a46f}} 
+\index{analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}!calculate\_avarage\_cpu\_usage@{calculate\_avarage\_cpu\_usage}}
+\index{calculate\_avarage\_cpu\_usage@{calculate\_avarage\_cpu\_usage}!analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{calculate\_avarage\_cpu\_usage()}{calculate\_avarage\_cpu\_usage()}}
+{\footnotesize\ttfamily U\+\_\+L calculate\+\_\+avarage\+\_\+cpu\+\_\+usage (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}}}]{current,  }\item[{struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}}}]{previous }\end{DoxyParamCaption})}
+
+
+
+Calculates the avarage cpu usage. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em current} & The current state of \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} \\
+\hline
+{\em previous} & The previous state of \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}}\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The avarage cpu usage. 
+\end{DoxyReturn}

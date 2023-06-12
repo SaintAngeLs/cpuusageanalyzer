@@ -1,0 +1,152 @@
+\hypertarget{reader__cpuanalyzer_8c}{}\doxysection{/home/kaliuser/\+Documents/portfolio/cpuusageanalizer/reader\+\_\+cpuanalyzer.c File Reference}
+\label{reader__cpuanalyzer_8c}\index{/home/kaliuser/Documents/portfolio/cpuusageanalizer/reader\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/reader\_cpuanalyzer.c}}
+{\ttfamily \#include \char`\"{}reader\+\_\+cpuanalyzer.\+h\char`\"{}}\newline
+Include dependency graph for reader\+\_\+cpuanalyzer.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{reader__cpuanalyzer_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+FILE $\ast$ \mbox{\hyperlink{reader__cpuanalyzer_8c_a80d062157a3f0952245f7bfa28d2c0b4}{open\+\_\+proc\+\_\+stat\+\_\+file}} ()
+\begin{DoxyCompactList}\small\item\em Function to open the /proc/stat file. \end{DoxyCompactList}\item 
+char $\ast$ \mbox{\hyperlink{reader__cpuanalyzer_8c_a47d2d204d5ca1317ad0a497f252ef2f0}{check\+\_\+token}} (char $\ast$token)
+\begin{DoxyCompactList}\small\item\em unction to handle error checking for a token \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{reader__cpuanalyzer_8c_ac8ea52a7ed66b5cb92e726c7c5590925}{set\+\_\+kernel\+\_\+proc\+\_\+stat\+\_\+values}} (struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} $\ast$stat, unsigned long values\mbox{[}$\,$\mbox{]}, char $\ast$name)
+\begin{DoxyCompactList}\small\item\em Function to set values in a \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{reader__cpuanalyzer_8c_a168b8a9c9889ca16f57803cfaf48d611}{parse\+\_\+proc\+\_\+line}} (const char $\ast$line, struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} $\ast$stat)
+\begin{DoxyCompactList}\small\item\em Function to parse a line from /proc/stat and store the values in a \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{reader__cpuanalyzer_8c_a0d1f8907924b121952984d7ef8278062}{get\+\_\+proc\+\_\+stat}} (struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} $\ast$stats)
+\begin{DoxyCompactList}\small\item\em Function to read CPU statistics from /proc/stat file. \end{DoxyCompactList}\item 
+void $\ast$ \mbox{\hyperlink{reader__cpuanalyzer_8c_aadd47a41b4e3542328bd9993ba3ffa29}{read\+\_\+proc\+\_\+stat\+\_\+thread}} (void $\ast$seq)
+\begin{DoxyCompactList}\small\item\em Reader thread function to read CPU statistics from /proc/stat file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{reader__cpuanalyzer_8c_a47d2d204d5ca1317ad0a497f252ef2f0}\label{reader__cpuanalyzer_8c_a47d2d204d5ca1317ad0a497f252ef2f0}} 
+\index{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!check\_token@{check\_token}}
+\index{check\_token@{check\_token}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{check\_token()}{check\_token()}}
+{\footnotesize\ttfamily char $\ast$ check\+\_\+token (\begin{DoxyParamCaption}\item[{char $\ast$}]{token }\end{DoxyParamCaption})}
+
+
+
+unction to handle error checking for a token 
+
+
+\begin{DoxyParams}{Parameters}
+{\em token} & The token to check\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The input token if it is not NULL, otherwise NULL This function checks if the input token is NULL. If the token is NULL, a \char`\"{}\+Parsing error\char`\"{} message is printed, and NULL is returned. Otherwise, the input token is returned. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{reader__cpuanalyzer_8c_a0d1f8907924b121952984d7ef8278062}\label{reader__cpuanalyzer_8c_a0d1f8907924b121952984d7ef8278062}} 
+\index{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!get\_proc\_stat@{get\_proc\_stat}}
+\index{get\_proc\_stat@{get\_proc\_stat}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{get\_proc\_stat()}{get\_proc\_stat()}}
+{\footnotesize\ttfamily int get\+\_\+proc\+\_\+stat (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} $\ast$}]{stats }\end{DoxyParamCaption})}
+
+
+
+Function to read CPU statistics from /proc/stat file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em stats} & Pointer to the \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} array to store the read statistics\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int 0 on success, -\/1 on failure
+\end{DoxyReturn}
+This function reads CPU statistics from the /proc/stat file. It opens the file using the open\+\_\+proc\+\_\+stat\+\_\+file function and reads each line. The lines are parsed using the parse\+\_\+proc\+\_\+line function to extract the relevant statistics. The parsed statistics are stored in the \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} array. If any error occurs during the file reading or parsing, -\/1 is returned. On success, 0 is returned.
+
+\begin{DoxyNote}{Note}
+The function reads one line for each CPU thread, excluding the overall CPU statistics. 
+
+The /proc/stat file is closed after reading. 
+\end{DoxyNote}
+\mbox{\Hypertarget{reader__cpuanalyzer_8c_a80d062157a3f0952245f7bfa28d2c0b4}\label{reader__cpuanalyzer_8c_a80d062157a3f0952245f7bfa28d2c0b4}} 
+\index{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!open\_proc\_stat\_file@{open\_proc\_stat\_file}}
+\index{open\_proc\_stat\_file@{open\_proc\_stat\_file}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{open\_proc\_stat\_file()}{open\_proc\_stat\_file()}}
+{\footnotesize\ttfamily FILE $\ast$ open\+\_\+proc\+\_\+stat\+\_\+file (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Function to open the /proc/stat file. 
+
+\begin{DoxyReturn}{Returns}
+FILE$\ast$ Pointer to the opened file, or NULL if an error occurs This function opens the /proc/stat file in read mode and returns a pointer to the opened file. If the file cannot be opened, an error message is printed and NULL is returned. The caller is responsible for closing the file when no longer needed. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{reader__cpuanalyzer_8c_a168b8a9c9889ca16f57803cfaf48d611}\label{reader__cpuanalyzer_8c_a168b8a9c9889ca16f57803cfaf48d611}} 
+\index{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!parse\_proc\_line@{parse\_proc\_line}}
+\index{parse\_proc\_line@{parse\_proc\_line}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{parse\_proc\_line()}{parse\_proc\_line()}}
+{\footnotesize\ttfamily int parse\+\_\+proc\+\_\+line (\begin{DoxyParamCaption}\item[{const char $\ast$}]{line,  }\item[{struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} $\ast$}]{stat }\end{DoxyParamCaption})}
+
+
+
+Function to parse a line from /proc/stat and store the values in a \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em line} & The line from /proc/stat to parse \\
+\hline
+{\em stat} & Pointer to the \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure to store the parsed values \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+int 0 on success, -\/1 on failure
+\end{DoxyReturn}
+This function parses a line from the /proc/stat file. It uses sscanf to extract the values from the line and store them in the \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. If the parsing fails or the number of parsed values is incorrect, an error message is printed, and -\/1 is returned. On success, 0 is returned. \mbox{\Hypertarget{reader__cpuanalyzer_8c_aadd47a41b4e3542328bd9993ba3ffa29}\label{reader__cpuanalyzer_8c_aadd47a41b4e3542328bd9993ba3ffa29}} 
+\index{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!read\_proc\_stat\_thread@{read\_proc\_stat\_thread}}
+\index{read\_proc\_stat\_thread@{read\_proc\_stat\_thread}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{read\_proc\_stat\_thread()}{read\_proc\_stat\_thread()}}
+{\footnotesize\ttfamily void $\ast$ read\+\_\+proc\+\_\+stat\+\_\+thread (\begin{DoxyParamCaption}\item[{void $\ast$}]{seq }\end{DoxyParamCaption})}
+
+
+
+Reader thread function to read CPU statistics from /proc/stat file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seq} & The sequence\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function runs in a separate thread and continuously reads CPU statistics from the /proc/stat file. It opens the /proc/stat file using the open\+\_\+proc\+\_\+stat\+\_\+file function and reads each line. The lines are parsed using the parse\+\_\+proc\+\_\+line function to extract the relevant statistics. The parsed statistics are then stored in the \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. The thread runs until a termination signal is received. The function uses the slots\+\_\+empty\+\_\+sem semaphore and the buffer\+Mutex mutex to synchronize access to the array\+\_\+stat buffer. After reading the statistics, the thread suspends execution for a specified amount of time using the usleep function.
+
+\begin{DoxyNote}{Note}
+The /proc/stat file is read line by line, and each line represents the statistics for a specific CPU thread. 
+
+The function handles error checking for file opening, parsing, and file closing. 
+\end{DoxyNote}
+\mbox{\Hypertarget{reader__cpuanalyzer_8c_ac8ea52a7ed66b5cb92e726c7c5590925}\label{reader__cpuanalyzer_8c_ac8ea52a7ed66b5cb92e726c7c5590925}} 
+\index{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!set\_kernel\_proc\_stat\_values@{set\_kernel\_proc\_stat\_values}}
+\index{set\_kernel\_proc\_stat\_values@{set\_kernel\_proc\_stat\_values}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{set\_kernel\_proc\_stat\_values()}{set\_kernel\_proc\_stat\_values()}}
+{\footnotesize\ttfamily void set\+\_\+kernel\+\_\+proc\+\_\+stat\+\_\+values (\begin{DoxyParamCaption}\item[{struct \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} $\ast$}]{stat,  }\item[{unsigned long}]{values\mbox{[}$\,$\mbox{]},  }\item[{char $\ast$}]{name }\end{DoxyParamCaption})}
+
+
+
+Function to set values in a \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em stat} & Pointer to the \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure to set values in \\
+\hline
+{\em values} & Array of unsigned long values to set in the structure \\
+\hline
+{\em name} & string to set in the structure\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function sets the values in a \mbox{\hyperlink{structkernel__proc__stat}{kernel\+\_\+proc\+\_\+stat}} structure. The name is copied into the structure using strncpy. The values are assigned to the corresponding members of the structure. 

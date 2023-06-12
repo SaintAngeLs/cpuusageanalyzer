@@ -1,0 +1,53 @@
+\hypertarget{watchdog__cpuanalyzer_8c}{}\doxysection{/home/kaliuser/\+Documents/portfolio/cpuusageanalizer/watchdog\+\_\+cpuanalyzer.c File Reference}
+\label{watchdog__cpuanalyzer_8c}\index{/home/kaliuser/Documents/portfolio/cpuusageanalizer/watchdog\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/watchdog\_cpuanalyzer.c}}
+{\ttfamily \#include \char`\"{}watchdog\+\_\+analyzer.\+h\char`\"{}}\newline
+Include dependency graph for watchdog\+\_\+cpuanalyzer.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{watchdog__cpuanalyzer_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{watchdog__cpuanalyzer_8c_aac6b636f13db3941c5efe1913dce7520}{watchdog\+\_\+notifier}} (int thread\+\_\+id)
+\begin{DoxyCompactList}\small\item\em Function to notify the watchdog about a thread\textquotesingle{}s activity. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{watchdog__cpuanalyzer_8c_acb11ab144f51a0a8a45fbd26bdaa3400}{watchdog\+\_\+proc\+\_\+stat\+\_\+thread}} ()
+\begin{DoxyCompactList}\small\item\em Watchdog thread function to monitor thread activity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{watchdog__cpuanalyzer_8c_aac6b636f13db3941c5efe1913dce7520}\label{watchdog__cpuanalyzer_8c_aac6b636f13db3941c5efe1913dce7520}} 
+\index{watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}!watchdog\_notifier@{watchdog\_notifier}}
+\index{watchdog\_notifier@{watchdog\_notifier}!watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{watchdog\_notifier()}{watchdog\_notifier()}}
+{\footnotesize\ttfamily void watchdog\+\_\+notifier (\begin{DoxyParamCaption}\item[{int}]{thread\+\_\+id }\end{DoxyParamCaption})}
+
+
+
+Function to notify the watchdog about a thread\textquotesingle{}s activity. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em thread\+\_\+id} & The ID of the thread to notify\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function notifies the watchdog about a thread\textquotesingle{}s activity by setting the corresponding flag in the threads\+\_\+to\+\_\+watchdog array. It acquires the watchdog\+\_\+buffer\+Mutex mutex before updating the flag to ensure thread safety. \mbox{\Hypertarget{watchdog__cpuanalyzer_8c_acb11ab144f51a0a8a45fbd26bdaa3400}\label{watchdog__cpuanalyzer_8c_acb11ab144f51a0a8a45fbd26bdaa3400}} 
+\index{watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}!watchdog\_proc\_stat\_thread@{watchdog\_proc\_stat\_thread}}
+\index{watchdog\_proc\_stat\_thread@{watchdog\_proc\_stat\_thread}!watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{watchdog\_proc\_stat\_thread()}{watchdog\_proc\_stat\_thread()}}
+{\footnotesize\ttfamily void watchdog\+\_\+proc\+\_\+stat\+\_\+thread (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Watchdog thread function to monitor thread activity. 
+
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function runs in a separate thread and continuously monitors the activity of the CPU analyzer threads. It sleeps for a specific time using the sleep function to allow the threads to perform their work. After the sleep period, it checks the threads\+\_\+to\+\_\+watchdog array to ensure that all threads have notified their activity. If any thread fails to notify its activity, an error message is printed, the sigterm\+\_\+handler function is called to initiate program termination, and the thread exits. The watchdog\+\_\+buffer\+Mutex mutex is used for thread safety during the activity check. 

@@ -1,0 +1,44 @@
+\hypertarget{printer__cpuanalyzer_8c}{}\doxysection{/home/kaliuser/\+Documents/portfolio/cpuusageanalizer/printer\+\_\+cpuanalyzer.c File Reference}
+\label{printer__cpuanalyzer_8c}\index{/home/kaliuser/Documents/portfolio/cpuusageanalizer/printer\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/printer\_cpuanalyzer.c}}
+{\ttfamily \#include \char`\"{}printer\+\_\+cpuanalyzer.\+h\char`\"{}}\newline
+Include dependency graph for printer\+\_\+cpuanalyzer.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{printer__cpuanalyzer_8c__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \mbox{\hyperlink{printer__cpuanalyzer_8c_a188984ace21e43bfd21580c0bb984cb2}{printer\+\_\+proc\+\_\+stat\+\_\+thread}} (void $\ast$seq)
+\begin{DoxyCompactList}\small\item\em Printer thread function to print CPU statistics to the console. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{printer__cpuanalyzer_8c_a188984ace21e43bfd21580c0bb984cb2}\label{printer__cpuanalyzer_8c_a188984ace21e43bfd21580c0bb984cb2}} 
+\index{printer\_cpuanalyzer.c@{printer\_cpuanalyzer.c}!printer\_proc\_stat\_thread@{printer\_proc\_stat\_thread}}
+\index{printer\_proc\_stat\_thread@{printer\_proc\_stat\_thread}!printer\_cpuanalyzer.c@{printer\_cpuanalyzer.c}}
+\doxysubsubsection{\texorpdfstring{printer\_proc\_stat\_thread()}{printer\_proc\_stat\_thread()}}
+{\footnotesize\ttfamily void $\ast$ printer\+\_\+proc\+\_\+stat\+\_\+thread (\begin{DoxyParamCaption}\item[{void $\ast$}]{seq }\end{DoxyParamCaption})}
+
+
+
+Printer thread function to print CPU statistics to the console. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em seq} & The sequence\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+void
+\end{DoxyReturn}
+This function runs in a separate thread and continuously prints CPU statistics to the console. It retrieves the data from the print buffer and prints it using the printf function. The thread runs until a termination signal is received. The function uses the slots\+\_\+filled\+\_\+sem\+\_\+printer semaphore and the print\+\_\+buffer\+Mutex mutex to synchronize access to the print buffer. After printing the data, the thread sleeps for 1 second before processing the next set of data.
+
+\begin{DoxyNote}{Note}
+The CPU statistics are printed in the format\+: \char`\"{}$<$processor\+\_\+number$>$. $<$usage\+\_\+percentage$>$\char`\"{} 
+
+The function does not perform error handling for the printf function. 
+\end{DoxyNote}
