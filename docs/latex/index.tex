@@ -1,0 +1,41 @@
+\label{index_md__home_kaliuser_Documents_portfolio_cpuusageanalizer_README}%
+\Hypertarget{index_md__home_kaliuser_Documents_portfolio_cpuusageanalizer_README}%
+ This is a CPU usage analyzer program that calculates and analyzes the CPU usage of the system. It consists of multiple components, including the reader, analyzer, printer, watchdog, and logger. The program reads the {\ttfamily /proc/stat} file to obtain CPU usage information, performs calculations, and presents the results.\hypertarget{index_autotoc_md1}{}\doxysection{How to Run}\label{index_autotoc_md1}
+To run the CPU usage analyzer program, follow these steps\+:
+
+
+\begin{DoxyEnumerate}
+\item Ensure that you have the required dependencies installed, including GCC (GNU Compiler Collection) and Python.
+\item Clone or download this repository to your local machine.
+\item Open a terminal and navigate to the project directory.
+\item Build the program by running the following command\+:
+
+make cpuanalyzer
+\item Once the compilation is successful, you can run the program by executing the following command\+:
+
+./cpuanalyzer
+\item The program will start analyzing the CPU usage and displaying the results.
+\end{DoxyEnumerate}\hypertarget{index_autotoc_md2}{}\doxysection{Testing}\label{index_autotoc_md2}
+To run the tests for the CPU usage analyzer, make sure you have Python installed on your system.
+
+
+\begin{DoxyEnumerate}
+\item Open a terminal and navigate to the project directory.
+\item Run the tests by executing the following command\+:
+
+make test
+
+This command will compile the program and run the test script ({\ttfamily test\+\_\+cpuanalyzer.\+py}). The test cases will be executed, and the test results will be displayed.
+\end{DoxyEnumerate}\hypertarget{index_autotoc_md3}{}\doxysection{Clean Up}\label{index_autotoc_md3}
+To clean up the generated files, use the following command\+:
+
+make clean
+
+This command will remove the compiled program and object files from the project directory.
+
+\DoxyHorRuler{0}
+
+
+Feel free to explore the source code files ({\ttfamily cpuanalyzer.\+c}, {\ttfamily reader\+\_\+cpuanalyzer.\+c}, {\ttfamily analyzer\+\_\+cpuanalyzer.\+c}, {\ttfamily printer\+\_\+cpuanalyzer.\+c}, {\ttfamily watchdog\+\_\+cpuanalyzer.\+c}, {\ttfamily logger\+\_\+cpuanalyzer.\+c}) for more details about the implementation of the CPU usage analyzer.
+
+If you encounter any issues or have questions, please feel free to create an issue on the Git\+Hub repository. 

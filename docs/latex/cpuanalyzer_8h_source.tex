@@ -1,0 +1,106 @@
+\hypertarget{cpuanalyzer_8h_source}{}\doxysection{/home/kaliuser/\+Documents/portfolio/cpuusageanalizer/cpuanalyzer.h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef CPUANALYZER\_H}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define CPUANALYZER\_H}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{4 \textcolor{preprocessor}{\#define \_GNU\_SOURCE}}
+\DoxyCodeLine{5 \textcolor{preprocessor}{\#include <stdio.h>}}
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#include <signal.h>} }
+\DoxyCodeLine{7 \textcolor{preprocessor}{\#include <stdio.h>}}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <stdlib.h>}}
+\DoxyCodeLine{9 \textcolor{preprocessor}{\#include <string.h>}}
+\DoxyCodeLine{10 \textcolor{preprocessor}{\#include <sys/socket.h>}}
+\DoxyCodeLine{11 \textcolor{preprocessor}{\#include <sys/time.h>}}
+\DoxyCodeLine{12 \textcolor{preprocessor}{\#include <sys/types.h>}}
+\DoxyCodeLine{13 \textcolor{preprocessor}{\#include <unistd.h>}}
+\DoxyCodeLine{14 \textcolor{preprocessor}{\#include <signal.h>}}
+\DoxyCodeLine{15 \textcolor{preprocessor}{\#include <errno.h>}}
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#include <pthread.h>}}
+\DoxyCodeLine{17 \textcolor{preprocessor}{\#include <semaphore.h>}}
+\DoxyCodeLine{18 }
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20 \textcolor{preprocessor}{\#include "{}watchdog\_analyzer.h"{}}}
+\DoxyCodeLine{21 }
+\DoxyCodeLine{22 }
+\DoxyCodeLine{23 }
+\DoxyCodeLine{24 \textcolor{preprocessor}{\#define U\_L unsigned long}}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26 \textcolor{preprocessor}{\#define BUFFER\_SIZE 10}}
+\DoxyCodeLine{27 \textcolor{preprocessor}{\#define ARRAY\_BUFFER\_SIZE 1024}}
+\DoxyCodeLine{28 \textcolor{preprocessor}{\#define S\_TIME\_SLEEP 2}}
+\DoxyCodeLine{29 \textcolor{preprocessor}{\#define THREADS\_NUMBER 4}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31 \textcolor{comment}{// Macro for handling errors with source indication:}}
+\DoxyCodeLine{32 \textcolor{preprocessor}{\#define ERR(source) \{ \(\backslash\)}}
+\DoxyCodeLine{33 \textcolor{preprocessor}{    perror(source); \(\backslash\)}}
+\DoxyCodeLine{34 \textcolor{preprocessor}{    fprintf(stderr, "{}\%s:\%d\(\backslash\)n"{}}, \_\_FILE\_\_, \_\_LINE\_\_); \(\backslash\)}
+\DoxyCodeLine{35     exit(EXIT\_FAILURE); \(\backslash\)}
+\DoxyCodeLine{36 \}}
+\DoxyCodeLine{37 }
+\DoxyCodeLine{38 \textcolor{preprocessor}{\#define HERR(source) \{ \(\backslash\)}}
+\DoxyCodeLine{39 \textcolor{preprocessor}{    fprintf(stderr, "{}\%s(\%d) at \%s:\%d\(\backslash\)n"{}}, source, h\_errno, \_\_FILE\_\_, \_\_LINE\_\_); \(\backslash\)}
+\DoxyCodeLine{40     exit(EXIT\_FAILURE); \(\backslash\)}
+\DoxyCodeLine{41 \}}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43 \textcolor{comment}{// struct THREAD\_STATE}}
+\DoxyCodeLine{44 \textcolor{comment}{// \{}}
+\DoxyCodeLine{45 \textcolor{comment}{//     int reader\_thread;}}
+\DoxyCodeLine{46 \textcolor{comment}{//     int analizer\_thread;}}
+\DoxyCodeLine{47 \textcolor{comment}{//     int printer\_thread;}}
+\DoxyCodeLine{48 \textcolor{comment}{// \};}}
+\DoxyCodeLine{49 }
+\DoxyCodeLine{50 \textcolor{comment}{//}}
+\DoxyCodeLine{51  \textcolor{keyword}{enum} THREAD\_STATE \{}
+\DoxyCodeLine{52     reader\_thread = 0,}
+\DoxyCodeLine{53     analizer\_thread = 1,}
+\DoxyCodeLine{54     printer\_thread = 2,}
+\DoxyCodeLine{55     logger\_thread = 3}
+\DoxyCodeLine{56  \};}
+\DoxyCodeLine{57 \textcolor{comment}{// Set the initial state}}
+\DoxyCodeLine{58 \textcolor{comment}{// Miscellaneous kernel statistics in /proc/stat from the  https://docs.kernel.org/filesystems/proc.html:}}
+\DoxyCodeLine{59 \textcolor{keyword}{struct }\mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}}}
+\DoxyCodeLine{60 \{}
+\DoxyCodeLine{61     \textcolor{keywordtype}{char} name[BUFFER\_SIZE];}
+\DoxyCodeLine{62     U\_L user, nice, system, idle, iowait, irq, softirq, steal, guest, guest\_nice;}
+\DoxyCodeLine{63 \};}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65 \textcolor{keyword}{extern} \textcolor{keyword}{volatile} sig\_atomic\_t term\_signal ;}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} available\_proc;}
+\DoxyCodeLine{68 \textcolor{keyword}{extern} sem\_t slots\_filled\_sem;}
+\DoxyCodeLine{69 \textcolor{keyword}{extern} sem\_t slots\_empty\_sem;}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71 \textcolor{keyword}{extern} pthread\_mutex\_t bufferMutex;}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \textcolor{keyword}{extern} \textcolor{keyword}{struct }\mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}} *array\_stat[BUFFER\_SIZE];}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76 \textcolor{keyword}{extern} pthread\_mutex\_t data\_mutex;}
+\DoxyCodeLine{77 }
+\DoxyCodeLine{78 \textcolor{keyword}{extern} sem\_t slots\_filled\_sem\_printer;}
+\DoxyCodeLine{79 \textcolor{keyword}{extern} sem\_t slots\_empty\_sem\_printer;}
+\DoxyCodeLine{80 \textcolor{keyword}{extern} pthread\_mutex\_t print\_bufferMutex;}
+\DoxyCodeLine{81 \textcolor{keyword}{extern} U\_L * print\_buffer[BUFFER\_SIZE];}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \textcolor{keyword}{extern} pthread\_mutex\_t watchdog\_bufferMutex;}
+\DoxyCodeLine{85 \textcolor{keyword}{extern} \textcolor{keywordtype}{int} threads\_to\_watchdog[THREADS\_NUMBER];}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87 \textcolor{keywordtype}{void} usage(\textcolor{keywordtype}{char} *name);}
+\DoxyCodeLine{88 \textcolor{keywordtype}{int} set\_handler(\textcolor{keywordtype}{void} (*f)(\textcolor{keywordtype}{int}), \textcolor{keywordtype}{int} sigNo);}
+\DoxyCodeLine{89 \textcolor{keywordtype}{void} sigterm\_handler();}
+\DoxyCodeLine{90 \textcolor{keywordtype}{void} readProcStat(FILE* file\_to\_read, \textcolor{keyword}{struct} \mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}}** stat, \textcolor{keywordtype}{int}* count\_thread, \textcolor{keywordtype}{int}* read\_cap);}
+\DoxyCodeLine{91 \textcolor{keywordtype}{void} parseProcStatLine(\textcolor{keywordtype}{char}* line, \textcolor{keyword}{struct} \mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}}* stat);}
+\DoxyCodeLine{92 \textcolor{keywordtype}{void} printProcStat(\textcolor{keyword}{struct} \mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}}* stat, \textcolor{keywordtype}{int} count\_thread);}
+\DoxyCodeLine{93 \textcolor{keyword}{struct }\mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}} *insert\_to\_array\_stat();}
+\DoxyCodeLine{94 U\_L *insert\_to\_print\_buffer();}
+\DoxyCodeLine{95 \textcolor{keywordtype}{void} join\_threads();}
+\DoxyCodeLine{96 \textcolor{keywordtype}{void} cleanup\_pthread\_mutex\_sem();}
+\DoxyCodeLine{97 \textcolor{keywordtype}{void} cleanup();}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99 }
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* CPUANALYZER\_H */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

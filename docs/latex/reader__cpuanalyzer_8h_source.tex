@@ -1,0 +1,21 @@
+\hypertarget{reader__cpuanalyzer_8h_source}{}\doxysection{/home/kaliuser/\+Documents/portfolio/cpuusageanalizer/reader\+\_\+cpuanalyzer.h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef READER\_CPUANALIZER\_H}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define READER\_CPUANALIZER\_H}}
+\DoxyCodeLine{3 \textcolor{preprocessor}{\#include "{}cpuanalyzer.h"{}}}
+\DoxyCodeLine{4 }
+\DoxyCodeLine{5 }
+\DoxyCodeLine{6 \textcolor{preprocessor}{\#define TIME\_SUSPEND 50000}}
+\DoxyCodeLine{7 }
+\DoxyCodeLine{8 \textcolor{keyword}{struct }\mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}};}
+\DoxyCodeLine{9 FILE* open\_proc\_stat\_file();}
+\DoxyCodeLine{10 \textcolor{keywordtype}{char}* check\_token(\textcolor{keywordtype}{char} *token);}
+\DoxyCodeLine{11 \textcolor{keywordtype}{void} set\_kernel\_proc\_stat\_values(\textcolor{keyword}{struct} \mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}}* stat, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} values[], \textcolor{keywordtype}{char}* name);}
+\DoxyCodeLine{12 \textcolor{keywordtype}{int} parse\_proc\_line(\textcolor{keyword}{const} \textcolor{keywordtype}{char}* line, \textcolor{keyword}{struct} \mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}}* stat);}
+\DoxyCodeLine{13 \textcolor{keywordtype}{int} get\_proc\_stat(\textcolor{keyword}{struct} \mbox{\hyperlink{structkernel__proc__stat}{kernel\_proc\_stat}} *stats);}
+\DoxyCodeLine{14 \textcolor{keywordtype}{void} *read\_proc\_stat\_thread(\textcolor{keywordtype}{void} *seq);}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{16 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/* READER\_CPUANALIZER\_H */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}
