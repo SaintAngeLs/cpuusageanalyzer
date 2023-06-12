@@ -1,0 +1,49 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\contentsline {chapter}{\numberline {1}CPU Usage Analyzer}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}How to Run}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Testing}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Clean Up}{2}{section.1.3}%
+\contentsline {chapter}{\numberline {2}Module Index}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Modules}{3}{section.2.1}%
+\contentsline {chapter}{\numberline {3}Class Index}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Class List}{5}{section.3.1}%
+\contentsline {chapter}{\numberline {4}File Index}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}File List}{7}{section.4.1}%
+\contentsline {chapter}{\numberline {5}Module Documentation}{9}{chapter.5}%
+\contentsline {section}{\numberline {5.1}analyzer cpuanalyzer}{9}{section.5.1}%
+\contentsline {section}{\numberline {5.2}cpuanalyzer}{9}{section.5.2}%
+\contentsline {section}{\numberline {5.3}logger cpuanalyzer}{9}{section.5.3}%
+\contentsline {section}{\numberline {5.4}printer cpuanalyzer}{9}{section.5.4}%
+\contentsline {section}{\numberline {5.5}reader cpuanalyzer}{10}{section.5.5}%
+\contentsline {section}{\numberline {5.6}watchdog cpuanalyzer}{10}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Class Documentation}{11}{chapter.6}%
+\contentsline {section}{\numberline {6.1}kernel\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}proc\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}stat Struct Reference}{11}{section.6.1}%
+\contentsline {chapter}{\numberline {7}File Documentation}{13}{chapter.7}%
+\contentsline {section}{\numberline {7.1}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/analyzer\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.c File Reference}{13}{section.7.1}%
+\contentsline {subsection}{\numberline {7.1.1}Function Documentation}{13}{subsection.7.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.1}analyzer\_proc\_stat\_thread()}{13}{subsubsection.7.1.1.1}%
+\contentsline {subsubsection}{\numberline {7.1.1.2}calculate\_avarage\_cpu\_usage()}{14}{subsubsection.7.1.1.2}%
+\contentsline {section}{\numberline {7.2}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/analyzer\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.h}{14}{section.7.2}%
+\contentsline {section}{\numberline {7.3}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/cpuanalyzer.h}{14}{section.7.3}%
+\contentsline {section}{\numberline {7.4}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/logger\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.c File Reference}{15}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Function Documentation}{16}{subsection.7.4.1}%
+\contentsline {subsubsection}{\numberline {7.4.1.1}logger\_proc\_stat\_thread()}{16}{subsubsection.7.4.1.1}%
+\contentsline {section}{\numberline {7.5}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/logger\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.h}{16}{section.7.5}%
+\contentsline {section}{\numberline {7.6}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/printer\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.c File Reference}{16}{section.7.6}%
+\contentsline {subsection}{\numberline {7.6.1}Function Documentation}{17}{subsection.7.6.1}%
+\contentsline {subsubsection}{\numberline {7.6.1.1}printer\_proc\_stat\_thread()}{17}{subsubsection.7.6.1.1}%
+\contentsline {section}{\numberline {7.7}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/printer\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.h}{17}{section.7.7}%
+\contentsline {section}{\numberline {7.8}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/reader\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.c File Reference}{17}{section.7.8}%
+\contentsline {subsection}{\numberline {7.8.1}Function Documentation}{18}{subsection.7.8.1}%
+\contentsline {subsubsection}{\numberline {7.8.1.1}check\_token()}{18}{subsubsection.7.8.1.1}%
+\contentsline {subsubsection}{\numberline {7.8.1.2}get\_proc\_stat()}{18}{subsubsection.7.8.1.2}%
+\contentsline {subsubsection}{\numberline {7.8.1.3}open\_proc\_stat\_file()}{19}{subsubsection.7.8.1.3}%
+\contentsline {subsubsection}{\numberline {7.8.1.4}parse\_proc\_line()}{19}{subsubsection.7.8.1.4}%
+\contentsline {subsubsection}{\numberline {7.8.1.5}read\_proc\_stat\_thread()}{19}{subsubsection.7.8.1.5}%
+\contentsline {subsubsection}{\numberline {7.8.1.6}set\_kernel\_proc\_stat\_values()}{20}{subsubsection.7.8.1.6}%
+\contentsline {section}{\numberline {7.9}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/reader\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.h}{20}{section.7.9}%
+\contentsline {section}{\numberline {7.10}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/watchdog\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}analyzer.h}{20}{section.7.10}%
+\contentsline {section}{\numberline {7.11}/home/kaliuser/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Documents/portfolio/cpuusageanalizer/watchdog\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}cpuanalyzer.c File Reference}{21}{section.7.11}%
+\contentsline {subsection}{\numberline {7.11.1}Function Documentation}{21}{subsection.7.11.1}%
+\contentsline {subsubsection}{\numberline {7.11.1.1}watchdog\_notifier()}{21}{subsubsection.7.11.1.1}%
+\contentsline {subsubsection}{\numberline {7.11.1.2}watchdog\_proc\_stat\_thread()}{21}{subsubsection.7.11.1.2}%

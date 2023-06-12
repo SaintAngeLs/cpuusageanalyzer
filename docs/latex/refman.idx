@@ -1,0 +1,36 @@
+\indexentry{analyzer cpuanalyzer@{analyzer cpuanalyzer}|hyperpage}{9}
+\indexentry{cpuanalyzer@{cpuanalyzer}|hyperpage}{9}
+\indexentry{logger cpuanalyzer@{logger cpuanalyzer}|hyperpage}{9}
+\indexentry{printer cpuanalyzer@{printer cpuanalyzer}|hyperpage}{9}
+\indexentry{reader cpuanalyzer@{reader cpuanalyzer}|hyperpage}{10}
+\indexentry{watchdog cpuanalyzer@{watchdog cpuanalyzer}|hyperpage}{10}
+\indexentry{kernel\_proc\_stat@{kernel\_proc\_stat}|hyperpage}{11}
+\indexentry{/home/kaliuser/Documents/portfolio/cpuusageanalizer/analyzer\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/analyzer\_cpuanalyzer.c}|hyperpage}{13}
+\indexentry{analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}!analyzer\_proc\_stat\_thread@{analyzer\_proc\_stat\_thread}|hyperpage}{13}
+\indexentry{analyzer\_proc\_stat\_thread@{analyzer\_proc\_stat\_thread}!analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}|hyperpage}{13}
+\indexentry{analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}!calculate\_avarage\_cpu\_usage@{calculate\_avarage\_cpu\_usage}|hyperpage}{13}
+\indexentry{calculate\_avarage\_cpu\_usage@{calculate\_avarage\_cpu\_usage}!analyzer\_cpuanalyzer.c@{analyzer\_cpuanalyzer.c}|hyperpage}{13}
+\indexentry{/home/kaliuser/Documents/portfolio/cpuusageanalizer/logger\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/logger\_cpuanalyzer.c}|hyperpage}{15}
+\indexentry{logger\_cpuanalyzer.c@{logger\_cpuanalyzer.c}!logger\_proc\_stat\_thread@{logger\_proc\_stat\_thread}|hyperpage}{16}
+\indexentry{logger\_proc\_stat\_thread@{logger\_proc\_stat\_thread}!logger\_cpuanalyzer.c@{logger\_cpuanalyzer.c}|hyperpage}{16}
+\indexentry{/home/kaliuser/Documents/portfolio/cpuusageanalizer/printer\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/printer\_cpuanalyzer.c}|hyperpage}{16}
+\indexentry{printer\_cpuanalyzer.c@{printer\_cpuanalyzer.c}!printer\_proc\_stat\_thread@{printer\_proc\_stat\_thread}|hyperpage}{17}
+\indexentry{printer\_proc\_stat\_thread@{printer\_proc\_stat\_thread}!printer\_cpuanalyzer.c@{printer\_cpuanalyzer.c}|hyperpage}{17}
+\indexentry{/home/kaliuser/Documents/portfolio/cpuusageanalizer/reader\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/reader\_cpuanalyzer.c}|hyperpage}{17}
+\indexentry{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!check\_token@{check\_token}|hyperpage}{18}
+\indexentry{check\_token@{check\_token}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}|hyperpage}{18}
+\indexentry{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!get\_proc\_stat@{get\_proc\_stat}|hyperpage}{18}
+\indexentry{get\_proc\_stat@{get\_proc\_stat}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}|hyperpage}{18}
+\indexentry{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!open\_proc\_stat\_file@{open\_proc\_stat\_file}|hyperpage}{19}
+\indexentry{open\_proc\_stat\_file@{open\_proc\_stat\_file}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}|hyperpage}{19}
+\indexentry{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!parse\_proc\_line@{parse\_proc\_line}|hyperpage}{19}
+\indexentry{parse\_proc\_line@{parse\_proc\_line}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}|hyperpage}{19}
+\indexentry{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!read\_proc\_stat\_thread@{read\_proc\_stat\_thread}|hyperpage}{19}
+\indexentry{read\_proc\_stat\_thread@{read\_proc\_stat\_thread}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}|hyperpage}{19}
+\indexentry{reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}!set\_kernel\_proc\_stat\_values@{set\_kernel\_proc\_stat\_values}|hyperpage}{20}
+\indexentry{set\_kernel\_proc\_stat\_values@{set\_kernel\_proc\_stat\_values}!reader\_cpuanalyzer.c@{reader\_cpuanalyzer.c}|hyperpage}{20}
+\indexentry{/home/kaliuser/Documents/portfolio/cpuusageanalizer/watchdog\_cpuanalyzer.c@{/home/kaliuser/Documents/portfolio/cpuusageanalizer/watchdog\_cpuanalyzer.c}|hyperpage}{21}
+\indexentry{watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}!watchdog\_notifier@{watchdog\_notifier}|hyperpage}{21}
+\indexentry{watchdog\_notifier@{watchdog\_notifier}!watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}|hyperpage}{21}
+\indexentry{watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}!watchdog\_proc\_stat\_thread@{watchdog\_proc\_stat\_thread}|hyperpage}{21}
+\indexentry{watchdog\_proc\_stat\_thread@{watchdog\_proc\_stat\_thread}!watchdog\_cpuanalyzer.c@{watchdog\_cpuanalyzer.c}|hyperpage}{21}
